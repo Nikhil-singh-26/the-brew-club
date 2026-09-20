@@ -29,28 +29,38 @@ const Navbar = () => {
 
         {/* Center / Right Links */}
         <div className="flex items-center gap-4">
-          <Link
-            href="/about"
-            className="text-sm font-medium text-gray-300 hover:text-white transition-colors hidden sm:block"
-          >
-            How it works
-          </Link>
-
           {session ? (
             <div className="relative">
               <button
                 onClick={() => setShowDropdown(!showDropdown)}
                 className="flex items-center gap-2.5 rounded-full border border-white/10 bg-white/5 py-1.5 pl-1.5 pr-3 text-sm text-gray-200 transition-all duration-200 hover:border-white/20 hover:bg-white/10"
               >
-                {session.user?.profilepic || session.user?.image ? (
-                  <img
-                    src={session.user?.profilepic || session.user?.image}
-                    alt={session.user?.name || "User"}
-                    className="h-8 w-8 rounded-full object-cover"
-                  />
+                {session.user?.profilepic ? (
+                  <>
+                    <img
+                      src={session.user.profilepic}
+                      alt={session.user?.displayName || session.user?.name || "User"}
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                        const fallback = e.currentTarget.parentElement?.querySelector(".avatar-fallback");
+                        if (fallback) fallback.style.display = "flex";
+                      }}
+                      className="h-8 w-8 rounded-full object-cover"
+                    />
+                    <div
+                      style={{ display: "none" }}
+                      className="avatar-fallback h-8 w-8 items-center justify-center rounded-full bg-linear-to-br from-amber-400 to-orange-500 text-xs font-bold text-black"
+                    >
+                      {(session.user?.displayName || session.user?.name || "U")
+                        .charAt(0)
+                        .toUpperCase()}
+                    </div>
+                  </>
                 ) : (
                   <div className="flex h-8 w-8 items-center justify-center rounded-full bg-linear-to-br from-amber-400 to-orange-500 text-xs font-bold text-black">
-                    {(session.user?.name || "U").charAt(0).toUpperCase()}
+                    {(session.user?.displayName || session.user?.name || "U")
+                      .charAt(0)
+                      .toUpperCase()}
                   </div>
                 )}
 

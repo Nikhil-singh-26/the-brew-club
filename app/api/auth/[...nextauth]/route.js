@@ -45,7 +45,10 @@ export const authOptions = {
             email: userEmail,
             name: user.name || baseUsername,
             username: finalUsername,
-            profilepic: user.image || "",
+            profilepic: "",
+            coverpic: "",
+            razorpayid: "",
+            razorpaysecret: "",
           });
         }
         return true;
@@ -65,6 +68,10 @@ export const authOptions = {
             session.user.username = dbUser.username;
             session.user.displayName = dbUser.name || dbUser.username;
             session.user.profilepic = dbUser.profilepic || "";
+            session.user.image = dbUser.profilepic || "";
+          } else {
+            session.user.profilepic = "";
+            session.user.image = "";
           }
         }
       } catch (error) {

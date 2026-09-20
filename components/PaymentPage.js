@@ -188,11 +188,22 @@ const PaymentPage = ({ username }) => {
         <section className="relative">
           <div className="h-56 w-full overflow-hidden bg-linear-to-b from-[#1c1710] via-[#141217] to-[#0b0b0f] md:h-80">
             {currentUser.coverpic ? (
-              <img
-                src={currentUser.coverpic}
-                alt={`${username}'s banner`}
-                className="h-full w-full object-cover opacity-80"
-              />
+              <>
+                <img
+                  src={currentUser.coverpic}
+                  alt={`${username}'s banner`}
+                  onError={(e) => {
+                    e.currentTarget.style.display = "none";
+                    const fallback = e.currentTarget.parentElement?.querySelector(".cover-fallback");
+                    if (fallback) fallback.style.display = "block";
+                  }}
+                  className="h-full w-full object-cover opacity-80"
+                />
+                <div
+                  style={{ display: "none" }}
+                  className="cover-fallback h-full w-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-500/10 via-transparent to-transparent"
+                />
+              </>
             ) : (
               <div className="h-full w-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-500/10 via-transparent to-transparent" />
             )}
@@ -203,14 +214,27 @@ const PaymentPage = ({ username }) => {
           <div className="absolute -bottom-16 left-1/2 -translate-x-1/2">
             <div className="rounded-full border-4 border-[#0b0b0f] bg-[#15151b] p-1 shadow-2xl">
               {currentUser.profilepic ? (
-                <img
-                  src={currentUser.profilepic}
-                  alt={currentUser.name || username}
-                  className="h-28 w-28 rounded-full object-cover md:h-32 md:w-32"
-                />
+                <>
+                  <img
+                    src={currentUser.profilepic}
+                    alt={currentUser.name || username}
+                    onError={(e) => {
+                      e.currentTarget.style.display = "none";
+                      const fallback = e.currentTarget.parentElement?.querySelector(".creator-avatar-fallback");
+                      if (fallback) fallback.style.display = "flex";
+                    }}
+                    className="h-28 w-28 rounded-full object-cover md:h-32 md:w-32"
+                  />
+                  <div
+                    style={{ display: "none" }}
+                    className="creator-avatar-fallback h-28 w-28 items-center justify-center rounded-full bg-linear-to-br from-amber-400 to-orange-500 text-4xl font-bold text-black md:h-32 md:w-32"
+                  >
+                    {(currentUser.name || username)?.charAt(0).toUpperCase()}
+                  </div>
+                </>
               ) : (
                 <div className="flex h-28 w-28 items-center justify-center rounded-full bg-linear-to-br from-amber-400 to-orange-500 text-4xl font-bold text-black md:h-32 md:w-32">
-                  {username?.charAt(0).toUpperCase()}
+                  {(currentUser.name || username)?.charAt(0).toUpperCase()}
                 </div>
               )}
             </div>

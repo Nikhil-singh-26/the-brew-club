@@ -7,8 +7,14 @@ import User from "@/models/User";
 export const POST = async (req) => {
   try {
     await connectDb();
-    const formData = await req.formData();
-    const body = Object.fromEntries(formData);
+    const contentType = req.headers.get("content-type") || "";
+    let body = {};
+    if (contentType.includes("application/json")) {
+      body = await req.json();
+    } else {
+      const formData = await req.formData();
+      body = Object.fromEntries(formData);
+    }
 
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = body;
 

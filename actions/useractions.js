@@ -151,6 +151,26 @@ export const updateProfile = async (data, oldusername) => {
       return { error: "Username must be at least 2 alphanumeric characters." };
     }
 
+    const reservedUsernames = [
+      "dashboard",
+      "profile",
+      "login",
+      "about",
+      "api",
+      "admin",
+      "user",
+      "terms",
+      "privacy",
+      "explore",
+      "home",
+      "favicon.ico",
+    ];
+    if (reservedUsernames.includes(newUsername)) {
+      return {
+        error: `The username '${newUsername}' is reserved. Please choose a different username.`,
+      };
+    }
+
     if (newUsername !== currentUser.username) {
       const existing = await User.findOne({
         username: newUsername,
@@ -166,16 +186,52 @@ export const updateProfile = async (data, oldusername) => {
       );
     }
 
+    const isValidHttpUrl = (string) => {
+      if (!string || typeof string !== "string") return true;
+      const trimmed = string.trim();
+      if (!trimmed) return true;
+      try {
+        const url = new URL(trimmed);
+        return url.protocol === "http:" || url.protocol === "https:";
+      } catch (_) {
+        return false;
+      }
+    };
+
+    const trimmedProfilePic =
+      typeof ndata.profilepic === "string" ? ndata.profilepic.trim() : currentUser.profilepic;
+    const trimmedCoverPic =
+      typeof ndata.coverpic === "string" ? ndata.coverpic.trim() : currentUser.coverpic;
+
+    if (trimmedProfilePic && !isValidHttpUrl(trimmedProfilePic)) {
+      return {
+        error: "Profile picture must be a valid URL starting with http:// or https://",
+      };
+    }
+
+    if (trimmedCoverPic && !isValidHttpUrl(trimmedCoverPic)) {
+      return {
+        error: "Cover banner must be a valid URL starting with http:// or https://",
+      };
+    }
+
+    const updatedName =
+      typeof ndata.name === "string" ? ndata.name.trim() : currentUser.name;
+    const updatedRazorpayId =
+      typeof ndata.razorpayid === "string" ? ndata.razorpayid.trim() : currentUser.razorpayid;
+    const updatedRazorpaySecret =
+      typeof ndata.razorpaysecret === "string" ? ndata.razorpaysecret.trim() : currentUser.razorpaysecret;
+
     await User.updateOne(
       { email: currentUser.email },
       {
         $set: {
-          name: typeof ndata.name === "string" ? ndata.name.trim() : currentUser.name,
+          name: updatedName,
           username: newUsername,
-          profilepic: typeof ndata.profilepic === "string" ? ndata.profilepic.trim() : currentUser.profilepic,
-          coverpic: typeof ndata.coverpic === "string" ? ndata.coverpic.trim() : currentUser.coverpic,
-          razorpayid: typeof ndata.razorpayid === "string" ? ndata.razorpayid.trim() : currentUser.razorpayid,
-          razorpaysecret: typeof ndata.razorpaysecret === "string" ? ndata.razorpaysecret.trim() : currentUser.razorpaysecret,
+          profilepic: trimmedProfilePic,
+          coverpic: trimmedCoverPic,
+          razorpayid: updatedRazorpayId,
+          razorpaysecret: updatedRazorpaySecret,
         },
       }
     );
@@ -184,6 +240,13 @@ export const updateProfile = async (data, oldusername) => {
       success: true,
       message: "Profile updated successfully.",
       username: newUsername,
+      user: {
+        name: updatedName,
+        username: newUsername,
+        profilepic: trimmedProfilePic,
+        coverpic: trimmedCoverPic,
+        razorpayid: updatedRazorpayId,
+      },
     };
   } catch (error) {
     console.error("Error in updateProfile:", error);

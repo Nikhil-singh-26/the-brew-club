@@ -7,7 +7,7 @@ import { fetchuser, updateProfile } from "@/actions/useractions";
 import { useToast } from "./Toast";
 
 const Dashboard = () => {
-  const { data: session, status } = useSession();
+  const { data: session, status, update } = useSession();
   const router = useRouter();
   const { toast } = useToast();
 
@@ -22,6 +22,7 @@ const Dashboard = () => {
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [imgError, setImgError] = useState(false);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -57,6 +58,9 @@ const Dashboard = () => {
   }, [session, status, router, toast]);
 
   const handleChange = (e) => {
+    if (e.target.name === "profilepic") {
+      setImgError(false);
+    }
     setForm((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
@@ -80,9 +84,24 @@ const Dashboard = () => {
         toast.error(res.error);
       } else if (res?.success) {
         toast.success(res.message || "Profile updated successfully!");
-        if (res.username && res.username !== session.user.name) {
-          router.refresh();
+
+        if (res.user) {
+          setForm((prev) => ({
+            ...prev,
+            name: res.user.name,
+            username: res.user.username,
+            profilepic: res.user.profilepic,
+            coverpic: res.user.coverpic,
+            razorpayid: res.user.razorpayid,
+          }));
         }
+
+        if (typeof update === "function") {
+          await update();
+        }
+
+        router.refresh();
+        router.push("/dashboard");
       }
     } catch (error) {
       console.error("Profile update failed:", error);
@@ -109,22 +128,33 @@ const Dashboard = () => {
     <main className="min-h-screen bg-[#0b0b0f] text-white">
       <div className="mx-auto max-w-5xl px-5 py-10 md:px-8 md:py-14">
         {/* Page Header */}
-        <div className="mb-10">
-          <p className="mb-3 text-sm font-medium uppercase tracking-[0.18em] text-amber-400">
-            Creator Dashboard
-          </p>
+        <div className="mb-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <p className="mb-3 text-sm font-medium uppercase tracking-[0.18em] text-amber-400">
+              Creator Dashboard
+            </p>
 
-          <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">
-            Welcome back,{" "}
-            <span className="text-amber-400">
-              {form.name || form.username || "Creator"}
-            </span>
-          </h1>
+            <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">
+              Welcome back,{" "}
+              <span className="text-amber-400">
+                {form.name || form.username || "Creator"}
+              </span>
+            </h1>
 
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-gray-400 md:text-base">
-            Keep your profile and payment keys up to date so your community can
-            discover and support your creative work.
-          </p>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-gray-400 md:text-base">
+              Keep your profile and payment keys up to date so your community can
+              discover and support your creative work.
+            </p>
+          </div>
+
+          {form.username && (
+            <a
+              href={`/${form.username}`}
+              className="inline-flex items-center gap-2 self-start sm:self-center rounded-xl border border-amber-400/30 bg-amber-400/10 px-4 py-2 text-xs font-semibold text-amber-400 hover:bg-amber-400/20 transition"
+            >
+              <span>☕</span> View Public Page
+            </a>
+          )}
         </div>
 
         <form onSubmit={handleSubmit}>
@@ -134,10 +164,11 @@ const Dashboard = () => {
             <div className="border-b border-white/10 px-6 py-6 md:px-8">
               <div className="flex items-center gap-4">
                 {/* Profile Image Preview */}
-                {form.profilepic ? (
+                {form.profilepic && !imgError ? (
                   <img
                     src={form.profilepic}
                     alt={form.name || "Profile"}
+                    onError={() => setImgError(true)}
                     className="h-16 w-16 rounded-2xl border border-white/10 object-cover"
                   />
                 ) : (
