@@ -1,63 +1,63 @@
-"use client"
+"use client";
 
-import React, { useState } from "react"
-import { useSession, signIn, signOut } from "next-auth/react"
-import Link from "next/link"
+import React, { useState } from "react";
+import { useSession, signOut } from "next-auth/react";
+import Link from "next/link";
 
 const Navbar = () => {
-  const { data: session } = useSession()
-  const [showDropdown, setShowDropdown] = useState(false)
+  const { data: session } = useSession();
+  const [showDropdown, setShowDropdown] = useState(false);
 
   return (
     <nav className="sticky top-0 z-50 border-b border-white/10 bg-[#0b0b0f]/90 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 md:px-8">
-
-        <Link href="/"
-          className="group flex items-center gap-2.5"
-        >
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-linear-to-br from-amber-400 to-orange-500 shadow-lg shadow-orange-500/20 transition-transform duration-200 group-hover:scale-105">
-            <span className="text-lg">☕</span>
+        {/* Brand Logo */}
+        <Link href="/" className="group flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg shadow-orange-500/20 transition-transform duration-200 group-hover:scale-105">
+            <span className="text-xl">☕</span>
           </div>
 
           <div className="flex flex-col leading-none">
-            <span className="text-[17px] font-semibold tracking-tight text-white">
+            <span className="text-lg font-bold tracking-tight text-white">
               The Brew Club
             </span>
-            <span className="mt-1 hidden text-[10px] font-medium uppercase tracking-[0.18em] text-gray-500 sm:block">
-              Create · Support · Belong
+            <span className="mt-1 hidden text-[10px] font-medium uppercase tracking-[0.18em] text-gray-400 sm:block">
+              Create · Support · Fuel
             </span>
           </div>
         </Link>
 
-
-        <div className="flex items-center gap-2">
+        {/* Center / Right Links */}
+        <div className="flex items-center gap-4">
+          <Link
+            href="/about"
+            className="text-sm font-medium text-gray-300 hover:text-white transition-colors hidden sm:block"
+          >
+            How it works
+          </Link>
 
           {session ? (
             <div className="relative">
-
               <button
                 onClick={() => setShowDropdown(!showDropdown)}
-                className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 py-1.5 pl-1.5 pr-3 text-sm text-gray-200 transition-all duration-200 hover:border-white/20 hover:bg-white/9"
+                className="flex items-center gap-2.5 rounded-full border border-white/10 bg-white/5 py-1.5 pl-1.5 pr-3 text-sm text-gray-200 transition-all duration-200 hover:border-white/20 hover:bg-white/10"
               >
-
-                {session.user?.image ? (
+                {session.user?.profilepic || session.user?.image ? (
                   <img
-                    src={session.user.image}
-                    alt={session.user.name || "User"}
+                    src={session.user?.profilepic || session.user?.image}
+                    alt={session.user?.name || "User"}
                     className="h-8 w-8 rounded-full object-cover"
                   />
                 ) : (
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-linear-to-br from-amber-400 to-orange-500 text-sm font-semibold text-black">
-                    {session.user?.name?.charAt(0).toUpperCase() || "U"}
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-orange-500 text-xs font-bold text-black">
+                    {(session.user?.name || "U").charAt(0).toUpperCase()}
                   </div>
                 )}
 
-        
-                <span className="hidden max-w-28 truncate sm:block">
+                <span className="hidden max-w-28 truncate font-medium sm:block">
                   {session.user?.name || "Account"}
                 </span>
 
-               
                 <svg
                   className={`h-3.5 w-3.5 text-gray-400 transition-transform duration-200 ${
                     showDropdown ? "rotate-180" : ""
@@ -73,71 +73,34 @@ const Navbar = () => {
                 </svg>
               </button>
 
-            
               {showDropdown && (
                 <>
-                 
-                  <button
-                    aria-label="Close menu"
-                    className="fixed inset-0 z-40 h-full w-full cursor-default"
+                  <div
+                    className="fixed inset-0 z-40 h-full w-full"
                     onClick={() => setShowDropdown(false)}
                   />
 
-                  <div className="absolute right-0 top-12 z-50 w-64 overflow-hidden rounded-2xl border border-white/10 bg-[#15151b] shadow-2xl shadow-black/40">
-
-                   
-                    <div className="border-b border-white/10 px-4 py-4">
-                      <div className="flex items-center gap-3">
-                        {session.user?.image ? (
-                          <img
-                            src={session.user.image}
-                            alt={session.user.name || "User"}
-                            className="h-10 w-10 rounded-full object-cover"
-                          />
-                        ) : (
-                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-linear-to-br from-amber-400 to-orange-500 font-semibold text-black">
-                            {session.user?.name?.charAt(0).toUpperCase() || "U"}
-                          </div>
-                        )}
-
-                        <div className="min-w-0">
-                          <p className="truncate text-sm font-medium text-white">
-                            {session.user?.name || "Member"}
-                          </p>
-
-                          {session.user?.email && (
-                            <p className="truncate text-xs text-gray-500">
-                              {session.user.email}
-                            </p>
-                          )}
-                        </div>
-                      </div>
+                  <div className="absolute right-0 top-12 z-50 w-64 overflow-hidden rounded-2xl border border-white/10 bg-[#15151b] shadow-2xl shadow-black/80">
+                    <div className="border-b border-white/10 px-4 py-3.5">
+                      <p className="truncate text-sm font-semibold text-white">
+                        {session.user?.displayName || session.user?.name || "Member"}
+                      </p>
+                      <p className="truncate text-xs text-amber-400">
+                        @{session.user?.name || "user"}
+                      </p>
                     </div>
 
-                 
-                    <div className="p-2">
-
+                    <div className="p-2 space-y-1">
                       <Link
                         href="/dashboard"
                         onClick={() => setShowDropdown(false)}
-                        className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-gray-300 transition-colors hover:bg-white/6 hover:text-white"
+                        className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition"
                       >
-                        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/6">
-                          <svg
-                            className="h-4 w-4"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="1.7"
-                            viewBox="0 0 24 24"
-                          >
-                            <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" />
-                          </svg>
-                        </span>
-
+                        <span>⚙️</span>
                         <div>
                           <p className="font-medium">Dashboard</p>
-                          <p className="text-xs text-gray-500">
-                            Manage your account
+                          <p className="text-[11px] text-gray-400">
+                            Profile & payment settings
                           </p>
                         </div>
                       </Link>
@@ -145,49 +108,27 @@ const Navbar = () => {
                       <Link
                         href={`/${session.user?.name}`}
                         onClick={() => setShowDropdown(false)}
-                        className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-gray-300 transition-colors hover:bg-white/6 hover:text-white"
+                        className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition"
                       >
-                        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/6">
-                          <svg
-                            className="h-4 w-4"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="1.7"
-                            viewBox="0 0 24 24"
-                          >
-                            <path d="M20 21a8 8 0 00-16 0" />
-                            <circle cx="12" cy="7" r="4" />
-                          </svg>
-                        </span>
-
+                        <span>☕</span>
                         <div>
-                          <p className="font-medium">Your page</p>
-                          <p className="text-xs text-gray-500">
-                            View your creator profile
+                          <p className="font-medium">Your Creator Page</p>
+                          <p className="text-[11px] text-gray-400">
+                            Public supporter link
                           </p>
                         </div>
                       </Link>
 
-                      <div className="my-2 border-t border-white/10" />
+                      <div className="my-1 border-t border-white/10" />
 
                       <button
-                        onClick={() => signOut()}
-                        className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-gray-400 transition-colors hover:bg-red-500/10 hover:text-red-400"
+                        onClick={() => {
+                          setShowDropdown(false);
+                          signOut({ callbackUrl: "/" });
+                        }}
+                        className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm text-rose-400 hover:bg-rose-500/10 transition"
                       >
-                        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/6">
-                          <svg
-                            className="h-4 w-4"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="1.7"
-                            viewBox="0 0 24 24"
-                          >
-                            <path d="M10 17l5-5-5-5" />
-                            <path d="M15 12H3" />
-                            <path d="M21 3v18" />
-                          </svg>
-                        </span>
-
+                        <span>🚪</span>
                         <span className="font-medium">Sign out</span>
                       </button>
                     </div>
@@ -196,22 +137,26 @@ const Navbar = () => {
               )}
             </div>
           ) : (
-            <>
-              <Link href="/login"
+            <div className="flex items-center gap-3">
+              <Link
+                href="/login"
                 className="rounded-full px-4 py-2 text-sm font-medium text-gray-300 transition-colors hover:text-white"
-              >Log in
+              >
+                Log in
               </Link>
 
-              <Link href="/login"
-                className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-black transition-all duration-200 hover:bg-gray-200 hover:shadow-lg hover:shadow-white/10"
-              >Join the club
+              <Link
+                href="/login"
+                className="rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-4 py-2 text-sm font-semibold text-black transition-all duration-200 hover:opacity-95 hover:shadow-lg hover:shadow-orange-500/20"
+              >
+                Join the club
               </Link>
-            </>
+            </div>
           )}
         </div>
       </div>
     </nav>
-  )
-}
+  );
+};
 
-export default Navbar
+export default Navbar;

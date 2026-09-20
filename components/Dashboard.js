@@ -1,127 +1,139 @@
-"use client"
+"use client";
 
-import React, { useEffect, useState } from "react"
-import { useSession } from "next-auth/react"
-import { useRouter } from "next/navigation"
-
-import { fetchuser, updateProfile } from "@/actions/useractions"
-
-import { ToastContainer, toast } from "react-toastify"
-import "react-toastify/dist/ReactToastify.css"
+import React, { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { fetchuser, updateProfile } from "@/actions/useractions";
+import { useToast } from "./Toast";
 
 const Dashboard = () => {
-  const { data: session } = useSession()
-  const router = useRouter()
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const { toast } = useToast();
 
-  const [form, setForm] = useState({})
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    username: "",
+    profilepic: "",
+    coverpic: "",
+    razorpayid: "",
+    razorpaysecret: "",
+  });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (!session) {
-      router.push("/login")
-      return
+    if (status === "unauthenticated") {
+      router.push("/login");
+      return;
     }
 
-    const getData = async () => {
-      try {
-        const user = await fetchuser(session.user?.name)
-        setForm(user)
-      } catch (error) {
-        console.error("Failed to load profile:", error)
-      } finally {
-        setLoading(false)
-      }
-    }
+    if (status === "authenticated" && session?.user?.name) {
+      const getData = async () => {
+        try {
+          const user = await fetchuser(session.user.name);
+          if (user) {
+            setForm({
+              name: user.name || "",
+              email: session.user.email || user.email || "",
+              username: user.username || session.user.name || "",
+              profilepic: user.profilepic || "",
+              coverpic: user.coverpic || "",
+              razorpayid: user.razorpayid || "",
+              razorpaysecret: user.razorpaysecret || "",
+            });
+          }
+        } catch (error) {
+          console.error("Failed to load profile:", error);
+          toast.error("Could not load your profile details.");
+        } finally {
+          setLoading(false);
+        }
+      };
 
-    getData()
-  }, [session, router])
+      getData();
+    }
+  }, [session, status, router, toast]);
 
   const handleChange = (e) => {
-    setForm({
-      ...form,
+    setForm((prev) => ({
+      ...prev,
       [e.target.name]: e.target.value,
-    })
-  }
+    }));
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    if (!session?.user?.name) return
+    if (!session?.user?.name) {
+      toast.error("You must be logged in to save changes.");
+      return;
+    }
 
-    setSaving(true)
+    setSaving(true);
 
     try {
-      await updateProfile(e, session.user.name)
+      const res = await updateProfile(form, session.user.name);
 
-      toast.success("Profile updated successfully", {
-        position: "top-right",
-        autoClose: 3000,
-        theme: "dark",
-      })
+      if (res?.error) {
+        toast.error(res.error);
+      } else if (res?.success) {
+        toast.success(res.message || "Profile updated successfully!");
+        if (res.username && res.username !== session.user.name) {
+          router.refresh();
+        }
+      }
     } catch (error) {
-      console.error("Profile update failed:", error)
-
-      toast.error("Something went wrong while saving", {
-        position: "top-right",
-        autoClose: 3000,
-        theme: "dark",
-      })
+      console.error("Profile update failed:", error);
+      toast.error("Something went wrong while saving.");
     } finally {
-      setSaving(false)
+      setSaving(false);
     }
-  }
+  };
 
-  if (loading) {
+  if (loading || status === "loading") {
     return (
       <main className="min-h-screen bg-[#0b0b0f] text-white">
         <div className="flex min-h-[70vh] items-center justify-center">
           <div className="flex flex-col items-center gap-4">
             <div className="h-9 w-9 animate-spin rounded-full border-2 border-white/10 border-t-amber-400" />
-            <p className="text-sm text-gray-500">
-              Loading your profile...
-            </p>
+            <p className="text-sm text-gray-500">Loading your profile...</p>
           </div>
         </div>
       </main>
-    )
+    );
   }
 
   return (
     <main className="min-h-screen bg-[#0b0b0f] text-white">
-      <ToastContainer />
-
       <div className="mx-auto max-w-5xl px-5 py-10 md:px-8 md:py-14">
-
         {/* Page Header */}
         <div className="mb-10">
           <p className="mb-3 text-sm font-medium uppercase tracking-[0.18em] text-amber-400">
-            Your space
+            Creator Dashboard
           </p>
 
           <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">
             Welcome back,{" "}
-            <span className="text-gray-400">
-              {form.name || session?.user?.name || "there"}.
+            <span className="text-amber-400">
+              {form.name || form.username || "Creator"}
             </span>
           </h1>
 
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-gray-500 md:text-base">
-            Keep your profile up to date so people who discover your work
-            know who they are supporting.
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-gray-400 md:text-base">
+            Keep your profile and payment keys up to date so your community can
+            discover and support your creative work.
           </p>
         </div>
 
         <form onSubmit={handleSubmit}>
-
           {/* Profile Card */}
-          <section className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.035]">
-
+          <section className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03]">
             {/* Card Header */}
             <div className="border-b border-white/10 px-6 py-6 md:px-8">
               <div className="flex items-center gap-4">
-
-                {/* Profile Image */}
+                {/* Profile Image Preview */}
                 {form.profilepic ? (
                   <img
                     src={form.profilepic}
@@ -129,8 +141,8 @@ const Dashboard = () => {
                     className="h-16 w-16 rounded-2xl border border-white/10 object-cover"
                   />
                 ) : (
-                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-linear-to-br from-amber-400 to-orange-500 text-2xl font-bold text-black">
-                    {(form.name || session?.user?.name || "U")
+                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 text-2xl font-bold text-black">
+                    {(form.name || form.username || "U")
                       .charAt(0)
                       .toUpperCase()}
                   </div>
@@ -138,11 +150,10 @@ const Dashboard = () => {
 
                 <div>
                   <h2 className="text-lg font-semibold text-white">
-                    Profile details
+                    Public Profile Information
                   </h2>
-
-                  <p className="mt-1 text-sm text-gray-500">
-                    This information represents you on The Brew Club.
+                  <p className="mt-1 text-sm text-gray-400">
+                    This information represents you on your public creator page.
                   </p>
                 </div>
               </div>
@@ -150,44 +161,40 @@ const Dashboard = () => {
 
             {/* Fields */}
             <div className="grid gap-6 p-6 md:grid-cols-2 md:p-8">
-
               {/* Name */}
               <div>
                 <label
                   htmlFor="name"
                   className="mb-2 block text-sm font-medium text-gray-300"
                 >
-                  Name
+                  Display Name
                 </label>
-
                 <input
-                  value={form.name || ""}
+                  value={form.name}
                   onChange={handleChange}
                   type="text"
                   name="name"
                   id="name"
-                  placeholder="Your name"
-                  className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400/60 focus:bg-black/30 focus:ring-2 focus:ring-amber-400/10"
+                  placeholder="Your full or creator name"
+                  className="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400/60 focus:bg-black/50 focus:ring-2 focus:ring-amber-400/10"
                 />
               </div>
 
-              {/* Email */}
+              {/* Email (read-only for security) */}
               <div>
                 <label
                   htmlFor="email"
                   className="mb-2 block text-sm font-medium text-gray-300"
                 >
-                  Email
+                  Account Email <span className="text-xs text-gray-500">(Verified)</span>
                 </label>
-
                 <input
-                  value={form.email || ""}
-                  onChange={handleChange}
+                  value={form.email}
+                  disabled
                   type="email"
                   name="email"
                   id="email"
-                  placeholder="you@example.com"
-                  className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400/60 focus:bg-black/30 focus:ring-2 focus:ring-amber-400/10"
+                  className="w-full rounded-xl border border-white/5 bg-black/10 px-4 py-3 text-sm text-gray-400 cursor-not-allowed outline-none"
                 />
               </div>
 
@@ -199,19 +206,22 @@ const Dashboard = () => {
                 >
                   Username
                 </label>
-
-                <input
-                  value={form.username || ""}
-                  onChange={handleChange}
-                  type="text"
-                  name="username"
-                  id="username"
-                  placeholder="yourusername"
-                  className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400/60 focus:bg-black/30 focus:ring-2 focus:ring-amber-400/10"
-                />
-
-                <p className="mt-2 text-xs text-gray-600">
-                  This can be used to identify your creator page.
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-gray-500">
+                    @
+                  </span>
+                  <input
+                    value={form.username}
+                    onChange={handleChange}
+                    type="text"
+                    name="username"
+                    id="username"
+                    placeholder="yourusername"
+                    className="w-full rounded-xl border border-white/10 bg-black/30 py-3 pl-8 pr-4 text-sm text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400/60 focus:bg-black/50 focus:ring-2 focus:ring-amber-400/10"
+                  />
+                </div>
+                <p className="mt-2 text-xs text-gray-500">
+                  Your public page URL: <span className="text-amber-400/90">/{form.username || "username"}</span>
                 </p>
               </div>
 
@@ -221,21 +231,19 @@ const Dashboard = () => {
                   htmlFor="profilepic"
                   className="mb-2 block text-sm font-medium text-gray-300"
                 >
-                  Profile picture
+                  Profile Picture URL
                 </label>
-
                 <input
-                  value={form.profilepic || ""}
+                  value={form.profilepic}
                   onChange={handleChange}
-                  type="text"
+                  type="url"
                   name="profilepic"
                   id="profilepic"
-                  placeholder="https://..."
-                  className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400/60 focus:bg-black/30 focus:ring-2 focus:ring-amber-400/10"
+                  placeholder="https://images.unsplash.com/..."
+                  className="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400/60 focus:bg-black/50 focus:ring-2 focus:ring-amber-400/10"
                 />
-
-                <p className="mt-2 text-xs text-gray-600">
-                  Add a URL for your profile image.
+                <p className="mt-2 text-xs text-gray-500">
+                  Direct image URL for your avatar.
                 </p>
               </div>
 
@@ -245,34 +253,29 @@ const Dashboard = () => {
                   htmlFor="coverpic"
                   className="mb-2 block text-sm font-medium text-gray-300"
                 >
-                  Cover image
+                  Cover Banner URL
                 </label>
-
                 <input
-                  value={form.coverpic || ""}
+                  value={form.coverpic}
                   onChange={handleChange}
-                  type="text"
+                  type="url"
                   name="coverpic"
                   id="coverpic"
-                  placeholder="https://..."
-                  className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400/60 focus:bg-black/30 focus:ring-2 focus:ring-amber-400/10"
+                  placeholder="https://images.unsplash.com/..."
+                  className="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400/60 focus:bg-black/50 focus:ring-2 focus:ring-amber-400/10"
                 />
-
-                <p className="mt-2 text-xs text-gray-600">
-                  A wide image that will appear at the top of your creator
-                  page.
+                <p className="mt-2 text-xs text-gray-500">
+                  A high-resolution banner image shown at the top of your creator page.
                 </p>
               </div>
             </div>
           </section>
 
           {/* Payment Section */}
-          <section className="mt-6 overflow-hidden rounded-3xl border border-white/10 bg-white/[0.035]">
-
+          <section className="mt-8 overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03]">
             {/* Header */}
             <div className="border-b border-white/10 px-6 py-6 md:px-8">
               <div className="flex items-start gap-4">
-
                 <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-amber-400/10 text-amber-400">
                   <svg
                     className="h-5 w-5"
@@ -281,118 +284,91 @@ const Dashboard = () => {
                     strokeWidth="1.7"
                     viewBox="0 0 24 24"
                   >
-                    <rect
-                      width="20"
-                      height="14"
-                      x="2"
-                      y="5"
-                      rx="2"
-                    />
+                    <rect width="20" height="14" x="2" y="5" rx="2" />
                     <path d="M2 10h20" />
                   </svg>
                 </div>
 
                 <div>
                   <h2 className="text-lg font-semibold text-white">
-                    Payment settings
+                    Razorpay Payment Gateway
                   </h2>
-
-                  <p className="mt-1 text-sm leading-5 text-gray-500">
-                    Connect your Razorpay account so supporters can contribute
-                    to your work.
+                  <p className="mt-1 text-sm leading-5 text-gray-400">
+                    Connect your Razorpay Key ID and Key Secret to receive direct
+                    supporter contributions into your bank account.
                   </p>
                 </div>
               </div>
             </div>
 
             {/* Payment Fields */}
-            <div className="grid gap-6 p-6 md:p-8">
-
-              {/* Razorpay ID */}
+            <div className="grid gap-6 p-6 md:grid-cols-2 md:p-8">
+              {/* Razorpay Key ID */}
               <div>
                 <label
                   htmlFor="razorpayid"
                   className="mb-2 block text-sm font-medium text-gray-300"
                 >
-                  Razorpay ID
+                  Razorpay Key ID
                 </label>
-
                 <input
-                  value={form.razorpayid || ""}
+                  value={form.razorpayid}
                   onChange={handleChange}
                   type="text"
                   name="razorpayid"
                   id="razorpayid"
-                  placeholder="Your Razorpay ID"
-                  className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400/60 focus:bg-black/30 focus:ring-2 focus:ring-amber-400/10"
+                  placeholder="rzp_live_... or rzp_test_..."
+                  className="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400/60 focus:bg-black/50 focus:ring-2 focus:ring-amber-400/10"
                 />
+                <p className="mt-2 text-xs text-gray-500">
+                  Public Razorpay API key identifier.
+                </p>
               </div>
 
-              {/* Razorpay Secret */}
+              {/* Razorpay Key Secret */}
               <div>
                 <label
                   htmlFor="razorpaysecret"
                   className="mb-2 block text-sm font-medium text-gray-300"
                 >
-                  Razorpay Secret
+                  Razorpay Key Secret
                 </label>
-
                 <input
-                  value={form.razorpaysecret || ""}
+                  value={form.razorpaysecret}
                   onChange={handleChange}
                   type="password"
                   name="razorpaysecret"
                   id="razorpaysecret"
-                  placeholder="Your Razorpay secret"
-                  className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400/60 focus:bg-black/30 focus:ring-2 focus:ring-amber-400/10"
+                  placeholder="••••••••••••••••••••••••"
+                  className="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400/60 focus:bg-black/50 focus:ring-2 focus:ring-amber-400/10"
                 />
-
-                <p className="mt-2 flex items-center gap-1.5 text-xs text-gray-600">
-                  <svg
-                    className="h-3.5 w-3.5"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.7"
-                    viewBox="0 0 24 24"
-                  >
-                    <rect
-                      width="18"
-                      height="11"
-                      x="3"
-                      y="11"
-                      rx="2"
-                    />
-                    <path d="M7 11V7a5 5 0 0110 0v4" />
-                  </svg>
-
-                  Keep your payment credentials private.
+                <p className="mt-2 text-xs text-amber-400/70">
+                  Your secret is encrypted and strictly hidden from public pages.
                 </p>
               </div>
             </div>
           </section>
 
-          {/* Save Area */}
-          <div className="mt-6 flex flex-col items-center justify-between gap-4 rounded-3xl border border-white/10 bg-white/2.5 p-5 sm:flex-row">
-
+          {/* Save Action */}
+          <div className="mt-8 flex flex-col items-center justify-between gap-4 rounded-3xl border border-white/10 bg-white/[0.02] p-6 sm:flex-row">
             <div>
-              <p className="text-sm font-medium text-gray-300">
-                Ready to save your changes?
+              <p className="text-sm font-medium text-gray-200">
+                Ready to save your profile changes?
               </p>
-
-              <p className="mt-1 text-xs text-gray-600">
-                Your updated profile will be reflected on your creator page.
+              <p className="mt-1 text-xs text-gray-400">
+                Changes will immediately update your public creator page.
               </p>
             </div>
 
             <button
               type="submit"
               disabled={saving}
-              className="flex min-w-36 items-center justify-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-semibold text-black transition-all duration-200 hover:bg-gray-200 hover:shadow-lg hover:shadow-white/10 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex min-w-40 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 px-6 py-3 text-sm font-semibold text-black transition-all duration-200 hover:opacity-95 hover:shadow-lg hover:shadow-orange-500/20 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {saving ? (
                 <>
-                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-black/20 border-t-black" />
-                  Saving...
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-black/30 border-t-black" />
+                  Saving changes...
                 </>
               ) : (
                 "Save changes"
@@ -402,7 +378,7 @@ const Dashboard = () => {
         </form>
       </div>
     </main>
-  )
-}
+  );
+};
 
-export default Dashboard
+export default Dashboard;

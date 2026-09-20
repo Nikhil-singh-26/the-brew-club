@@ -1,31 +1,35 @@
-import React from 'react'
-import PaymentPage from '@/components/PaymentPage'
-import { notFound } from "next/navigation"
-import connectDb from '@/db/connectDb'
-import User from '@/models/User'
+import React from "react";
+import PaymentPage from "@/components/PaymentPage";
+import { notFound } from "next/navigation";
+import connectDb from "@/db/connectDb";
+import User from "@/models/User";
+
 const Username = async ({ params }) => {
+  const resolvedParams = await params;
+  const username = resolvedParams?.username;
 
-  // If the username is not present in the database, show a 404 page
-  const checkUser = async () => {
-    await connectDb()
-    let u = await User.findOne({ username: params.username })
-    if (!u) {
-      return notFound()
-    }
+  if (!username) {
+    return notFound();
   }
-  await checkUser()
 
-  return (
-    <>
-      <PaymentPage username={params.username} />
-    </>
-  )
-}
+  await connectDb();
+  const user = await User.findOne({ username }).lean();
 
-export default Username
- 
+  if (!user) {
+    return notFound();
+  }
+
+  return <PaymentPage username={username} />;
+};
+
+export default Username;
+
 export async function generateMetadata({ params }) {
+  const resolvedParams = await params;
+  const username = resolvedParams?.username || "Creator";
+
   return {
-    title: `Support ${params.username} - The Brew Club`,
-  }
+    title: `Support @${username} - The Brew Club`,
+    description: `Support @${username} on The Brew Club. Fuel their creative journey.`,
+  };
 }
