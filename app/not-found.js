@@ -19,7 +19,7 @@ export default function NotFound() {
       <div className="flex items-center gap-4 mt-8">
         <Link
           href="/"
-          className="rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 px-6 py-3 text-sm font-bold text-black transition hover:opacity-95"
+          className="rounded-xl bg-linear-to-r from-amber-400 to-orange-500 px-6 py-3 text-sm font-bold text-black transition hover:opacity-95"
         >
           Return Home
         </Link>

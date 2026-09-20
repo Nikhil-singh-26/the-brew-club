@@ -11,7 +11,7 @@ export default function Home() {
     <main className="bg-[#0b0b0f] text-white overflow-hidden">
       {/* Hero Section */}
       <section className="relative min-h-[75vh] flex items-center justify-center px-6 py-16">
-        <div className="absolute top-20 left-1/2 -translate-x-1/2 w-120 h-72 bg-gradient-to-r from-amber-500/15 to-orange-500/15 blur-[120px] rounded-full pointer-events-none" />
+        <div className="absolute top-20 left-1/2 -translate-x-1/2 w-120 h-72 bg-linear-to-r from-amber-500/15 to-orange-500/15 blur-[120px] rounded-full pointer-events-none" />
 
         <div className="relative z-10 max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 mb-6 rounded-full border border-white/10 bg-white/5 text-xs font-medium text-amber-300">
@@ -21,7 +21,7 @@ export default function Home() {
 
           <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight">
             Empower creators,{" "}
-            <span className="bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">
               one brew at a time.
             </span>
           </h1>
@@ -35,7 +35,7 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
             <Link
               href="/login"
-              className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 hover:opacity-95 text-black font-bold transition-all duration-200 hover:-translate-y-0.5 shadow-lg shadow-orange-500/20 text-center"
+              className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-linear-to-r from-amber-400 to-orange-500 hover:opacity-95 text-black font-bold transition-all duration-200 hover:-translate-y-0.5 shadow-lg shadow-orange-500/20 text-center"
             >
               Start Your Creator Page →
             </Link>
@@ -70,7 +70,7 @@ export default function Home() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
           {/* Feature 1 */}
-          <div className="rounded-3xl border border-white/10 bg-white/[0.02] p-8 hover:bg-white/[0.04] transition">
+          <div className="rounded-3xl border border-white/10 bg-white/2 p-8 hover:bg-white/4 transition">
             <div className="w-12 h-12 flex items-center justify-center rounded-2xl bg-amber-400/10 text-2xl mb-6">
               🎨
             </div>
@@ -83,7 +83,7 @@ export default function Home() {
           </div>
 
           {/* Feature 2 */}
-          <div className="rounded-3xl border border-white/10 bg-white/[0.02] p-8 hover:bg-white/[0.04] transition">
+          <div className="rounded-3xl border border-white/10 bg-white/2 p-8 hover:bg-white/4 transition">
             <div className="w-12 h-12 flex items-center justify-center rounded-2xl bg-amber-400/10 text-2xl mb-6">
               ⚡
             </div>
@@ -96,7 +96,7 @@ export default function Home() {
           </div>
 
           {/* Feature 3 */}
-          <div className="rounded-3xl border border-white/10 bg-white/[0.02] p-8 hover:bg-white/[0.04] transition">
+          <div className="rounded-3xl border border-white/10 bg-white/2 p-8 hover:bg-white/4 transition">
             <div className="w-12 h-12 flex items-center justify-center rounded-2xl bg-amber-400/10 text-2xl mb-6">
               💬
             </div>
@@ -112,7 +112,7 @@ export default function Home() {
 
       {/* Quote Banner */}
       <section className="px-6 pb-20">
-        <div className="max-w-4xl mx-auto rounded-3xl border border-white/10 bg-gradient-to-br from-amber-500/10 via-white/[0.02] to-transparent p-8 sm:p-12 text-center">
+        <div className="max-w-4xl mx-auto rounded-3xl border border-white/10 bg-linear-to-br from-amber-500/10 via-white/2 to-transparent p-8 sm:p-12 text-center">
           <span className="text-3xl">☕</span>
           <p className="mt-4 text-xl sm:text-2xl font-medium text-gray-200 leading-relaxed">
             "A small vote of confidence from a supporter can be the exact spark that turns a side project into something extraordinary."
@@ -134,7 +134,7 @@ export default function Home() {
           </p>
           <Link
             href="/login"
-            className="inline-block mt-8 px-8 py-3.5 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 hover:opacity-95 text-black font-bold transition-all duration-200 hover:-translate-y-0.5 shadow-lg shadow-orange-500/20"
+            className="inline-block mt-8 px-8 py-3.5 rounded-xl bg-linear-to-r from-amber-400 to-orange-500 hover:opacity-95 text-black font-bold transition-all duration-200 hover:-translate-y-0.5 shadow-lg shadow-orange-500/20"
           >
             Get Started with The Brew Club →
           </Link>

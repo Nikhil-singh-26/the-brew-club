@@ -129,7 +129,7 @@ const Dashboard = () => {
 
         <form onSubmit={handleSubmit}>
           {/* Profile Card */}
-          <section className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03]">
+          <section className="overflow-hidden rounded-3xl border border-white/10 bg-white/3">
             {/* Card Header */}
             <div className="border-b border-white/10 px-6 py-6 md:px-8">
               <div className="flex items-center gap-4">
@@ -141,7 +141,7 @@ const Dashboard = () => {
                     className="h-16 w-16 rounded-2xl border border-white/10 object-cover"
                   />
                 ) : (
-                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 text-2xl font-bold text-black">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-linear-to-br from-amber-400 to-orange-500 text-2xl font-bold text-black">
                     {(form.name || form.username || "U")
                       .charAt(0)
                       .toUpperCase()}
@@ -272,7 +272,7 @@ const Dashboard = () => {
           </section>
 
           {/* Payment Section */}
-          <section className="mt-8 overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03]">
+          <section className="mt-8 overflow-hidden rounded-3xl border border-white/10 bg-white/3">
             {/* Header */}
             <div className="border-b border-white/10 px-6 py-6 md:px-8">
               <div className="flex items-start gap-4">
@@ -350,7 +350,7 @@ const Dashboard = () => {
           </section>
 
           {/* Save Action */}
-          <div className="mt-8 flex flex-col items-center justify-between gap-4 rounded-3xl border border-white/10 bg-white/[0.02] p-6 sm:flex-row">
+          <div className="mt-8 flex flex-col items-center justify-between gap-4 rounded-3xl border border-white/10 bg-white/2 p-6 sm:flex-row">
             <div>
               <p className="text-sm font-medium text-gray-200">
                 Ready to save your profile changes?
@@ -363,7 +363,7 @@ const Dashboard = () => {
             <button
               type="submit"
               disabled={saving}
-              className="flex min-w-40 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 px-6 py-3 text-sm font-semibold text-black transition-all duration-200 hover:opacity-95 hover:shadow-lg hover:shadow-orange-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex min-w-40 items-center justify-center gap-2 rounded-xl bg-linear-to-r from-amber-400 to-orange-500 px-6 py-3 text-sm font-semibold text-black transition-all duration-200 hover:opacity-95 hover:shadow-lg hover:shadow-orange-500/20 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {saving ? (
                 <>

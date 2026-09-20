@@ -186,7 +186,7 @@ const PaymentPage = ({ username }) => {
       <main className="min-h-screen bg-[#0b0b0f] text-white pb-20">
         {/* Creator Cover Banner */}
         <section className="relative">
-          <div className="h-56 w-full overflow-hidden bg-gradient-to-b from-[#1c1710] via-[#141217] to-[#0b0b0f] md:h-80">
+          <div className="h-56 w-full overflow-hidden bg-linear-to-b from-[#1c1710] via-[#141217] to-[#0b0b0f] md:h-80">
             {currentUser.coverpic ? (
               <img
                 src={currentUser.coverpic}
@@ -196,7 +196,7 @@ const PaymentPage = ({ username }) => {
             ) : (
               <div className="h-full w-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-500/10 via-transparent to-transparent" />
             )}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0b0b0f] via-transparent to-black/20" />
+            <div className="absolute inset-0 bg-linear-to-t from-[#0b0b0f] via-transparent to-black/20" />
           </div>
 
           {/* Profile Picture */}
@@ -209,7 +209,7 @@ const PaymentPage = ({ username }) => {
                   className="h-28 w-28 rounded-full object-cover md:h-32 md:w-32"
                 />
               ) : (
-                <div className="flex h-28 w-28 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-orange-500 text-4xl font-bold text-black md:h-32 md:w-32">
+                <div className="flex h-28 w-28 items-center justify-center rounded-full bg-linear-to-br from-amber-400 to-orange-500 text-4xl font-bold text-black md:h-32 md:w-32">
                   {username?.charAt(0).toUpperCase()}
                 </div>
               )}
@@ -462,7 +462,7 @@ const PaymentPage = ({ username }) => {
                   !paymentform.amount ||
                   Number(paymentform.amount) < 1
                 }
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 px-6 py-3.5 text-sm font-bold text-black transition-all duration-200 hover:opacity-95 hover:shadow-lg hover:shadow-orange-500/20 disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-linear-to-r from-amber-400 to-orange-500 px-6 py-3.5 text-sm font-bold text-black transition-all duration-200 hover:opacity-95 hover:shadow-lg hover:shadow-orange-500/20 disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
               >
                 {paying ? (
                   <>

@@ -13,7 +13,7 @@ const Navbar = () => {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 md:px-8">
         {/* Brand Logo */}
         <Link href="/" className="group flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg shadow-orange-500/20 transition-transform duration-200 group-hover:scale-105">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-br from-amber-400 to-orange-500 shadow-lg shadow-orange-500/20 transition-transform duration-200 group-hover:scale-105">
             <span className="text-xl">☕</span>
           </div>
 
@@ -49,7 +49,7 @@ const Navbar = () => {
                     className="h-8 w-8 rounded-full object-cover"
                   />
                 ) : (
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-orange-500 text-xs font-bold text-black">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-linear-to-br from-amber-400 to-orange-500 text-xs font-bold text-black">
                     {(session.user?.name || "U").charAt(0).toUpperCase()}
                   </div>
                 )}
@@ -147,7 +147,7 @@ const Navbar = () => {
 
               <Link
                 href="/login"
-                className="rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-4 py-2 text-sm font-semibold text-black transition-all duration-200 hover:opacity-95 hover:shadow-lg hover:shadow-orange-500/20"
+                className="rounded-full bg-linear-to-r from-amber-400 to-orange-500 px-4 py-2 text-sm font-semibold text-black transition-all duration-200 hover:opacity-95 hover:shadow-lg hover:shadow-orange-500/20"
               >
                 Join the club
               </Link>
