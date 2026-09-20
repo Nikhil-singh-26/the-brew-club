@@ -201,11 +201,11 @@ const PaymentPage = ({ username }) => {
                 />
                 <div
                   style={{ display: "none" }}
-                  className="cover-fallback h-full w-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-500/10 via-transparent to-transparent"
+                  className="cover-fallback h-full w-full bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-amber-500/10 via-transparent to-transparent"
                 />
               </>
             ) : (
-              <div className="h-full w-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-500/10 via-transparent to-transparent" />
+              <div className="h-full w-full bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-amber-500/10 via-transparent to-transparent" />
             )}
             <div className="absolute inset-0 bg-linear-to-t from-[#0b0b0f] via-transparent to-black/20" />
           </div>
@@ -260,7 +260,7 @@ const PaymentPage = ({ username }) => {
             </p>
 
             {/* Stats Bar */}
-            <div className="mt-8 inline-flex items-center gap-8 rounded-2xl border border-white/10 bg-white/[0.03] px-8 py-4">
+            <div className="mt-8 inline-flex items-center gap-8 rounded-2xl border border-white/10 bg-white/3 px-8 py-4">
               <div>
                 <p className="text-2xl font-bold text-white">
                   {payments.length}
@@ -287,7 +287,7 @@ const PaymentPage = ({ username }) => {
         {/* Main Grid: Supporters & Contribution Card */}
         <section className="mx-auto grid max-w-6xl gap-8 px-5 md:grid-cols-2 md:px-8">
           {/* Supporters List */}
-          <div className="rounded-3xl border border-white/10 bg-white/[0.03] overflow-hidden flex flex-col">
+          <div className="rounded-3xl border border-white/10 bg-white/3 overflow-hidden flex flex-col">
             <div className="border-b border-white/10 px-6 py-6 md:px-8">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-amber-400">
                 Community Backing
@@ -318,7 +318,7 @@ const PaymentPage = ({ username }) => {
                   {payments.map((payment, index) => (
                     <div
                       key={payment._id || index}
-                      className="rounded-2xl border border-white/5 bg-white/[0.02] p-4 transition hover:bg-white/[0.04]"
+                      className="rounded-2xl border border-white/5 bg-white/2 p-4 transition hover:bg-white/4"
                     >
                       <div className="flex items-center justify-between gap-3">
                         <div className="flex items-center gap-3 min-w-0">
@@ -362,7 +362,7 @@ const PaymentPage = ({ username }) => {
           </div>
 
           {/* Support Form Card */}
-          <div className="rounded-3xl border border-white/10 bg-white/[0.03] overflow-hidden">
+          <div className="rounded-3xl border border-white/10 bg-white/3 overflow-hidden">
             <div className="border-b border-white/10 px-6 py-6 md:px-8">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-amber-400">
                 Support The Creator
@@ -467,7 +467,7 @@ const PaymentPage = ({ username }) => {
                       className={`rounded-xl border py-2.5 text-xs font-semibold transition ${
                         paymentform.amount === String(preset)
                           ? "border-amber-400 bg-amber-400/15 text-amber-400"
-                          : "border-white/10 bg-white/[0.03] text-gray-300 hover:border-white/20 hover:text-white"
+                          : "border-white/10 bg-white/3 text-gray-300 hover:border-white/20 hover:text-white"
                       }`}
                     >
                       ₹{preset}
