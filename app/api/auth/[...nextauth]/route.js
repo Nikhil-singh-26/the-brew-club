@@ -1,8 +1,6 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import LinkedinProvider from "next-auth/providers/linkedin";
 import GitHubProvider from "next-auth/providers/github";
-import TwitterProvider from "next-auth/providers/twitter";
 import connectDb from "@/db/connectDb";
 import User from "@/models/User";
 
@@ -15,15 +13,6 @@ export const authOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_ID || "",
       clientSecret: process.env.GOOGLE_SECRET || "",
-    }),
-    LinkedinProvider({
-      clientId: process.env.LINKEDIN_ID || "",
-      clientSecret: process.env.LINKEDIN_SECRET || "",
-    }),
-    TwitterProvider({
-      clientId: process.env.TWITTER_ID || "",
-      clientSecret: process.env.TWITTER_SECRET || "",
-      version: "2.0",
     }),
   ],
   secret: process.env.NEXTAUTH_SECRET,

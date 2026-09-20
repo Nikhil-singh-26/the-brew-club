@@ -6,7 +6,7 @@ The Brew Club is a modern creator-support and crowdfunding platform built with N
 
 - **Framework**: Next.js 16 (App Router)
 - **UI & Styling**: React 19, Tailwind CSS v4
-- **Authentication**: NextAuth.js (GitHub, Google, LinkedIn, Twitter/X)
+- **Authentication**: NextAuth.js (GitHub, Google)
 - **Database**: MongoDB with Mongoose ODM
 - **Payments**: Razorpay Gateway (Direct creator credentials)
 
@@ -38,11 +38,6 @@ GITHUB_SECRET=your_github_client_secret
 GOOGLE_ID=your_google_client_id
 GOOGLE_SECRET=your_google_client_secret
 
-LINKEDIN_ID=your_linkedin_client_id
-LINKEDIN_SECRET=your_linkedin_client_secret
-
-TWITTER_ID=your_twitter_client_id
-TWITTER_SECRET=your_twitter_client_secret
 ```
 
 ### 3. Run Development Server
