@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from "react";
 import Script from "next/script";
+import Link from "next/link";
 import { fetchuser, fetchpayments, initiate } from "@/actions/useractions";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useToast } from "./Toast";
@@ -38,20 +39,51 @@ const PaymentPage = ({ username }) => {
   }, [username]);
 
   useEffect(() => {
-    loadData();
-  }, [loadData]);
+    let isMounted = true;
+    const fetchInitialData = async () => {
+      try {
+        const user = await fetchuser(username);
+        if (!isMounted) return;
+        setCurrentUser(user);
+
+        const dbpayments = await fetchpayments(username);
+        if (!isMounted) return;
+        setPayments(dbpayments || []);
+      } catch (error) {
+        console.error("Failed to load creator data:", error);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    fetchInitialData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [username]);
 
   useEffect(() => {
     const paymentStatus = searchParams.get("paymentdone");
     if (paymentStatus === "true") {
       toast.success("Thank you for supporting this creator! ☕");
-      loadData();
+      const refreshAfterPayment = async () => {
+        try {
+          const user = await fetchuser(username);
+          setCurrentUser(user);
+          const dbpayments = await fetchpayments(username);
+          setPayments(dbpayments || []);
+        } catch (err) {
+          console.error("Failed to refresh creator data:", err);
+        }
+      };
+      refreshAfterPayment();
       router.replace(`/${username}`);
     } else if (paymentStatus === "failed") {
       toast.error("Payment verification could not be completed.");
       router.replace(`/${username}`);
     }
-  }, [searchParams, router, username, toast, loadData]);
+  }, [searchParams, router, username, toast]);
 
   const handleChange = (e) => {
     setPaymentform((prev) => ({
@@ -168,8 +200,22 @@ const PaymentPage = ({ username }) => {
           <div className="text-4xl mb-4">🔍</div>
           <h1 className="text-2xl font-bold">Creator Not Found</h1>
           <p className="mt-2 text-sm text-gray-400">
-            The creator @{username} doesn't seem to exist on The Brew Club yet.
+            The creator @{username} doesn&apos;t seem to exist on The Brew Club yet.
           </p>
+          <div className="flex items-center justify-center gap-3 mt-6">
+            <Link
+              href="/creators"
+              className="rounded-xl bg-linear-to-r from-amber-400 to-orange-500 px-5 py-2.5 text-xs font-bold text-black transition hover:opacity-95"
+            >
+              Discover Creators
+            </Link>
+            <Link
+              href="/"
+              className="rounded-xl border border-white/10 bg-white/5 px-5 py-2.5 text-xs font-semibold text-white transition hover:bg-white/10"
+            >
+              Back to Home
+            </Link>
+          </div>
         </div>
       </main>
     );
@@ -252,12 +298,18 @@ const PaymentPage = ({ username }) => {
               {currentUser.name || username}
             </h1>
 
-            <p className="mt-1 text-sm text-gray-400">@{username}</p>
+            <p className="mt-1 text-sm text-amber-400/90 font-medium">@{username}</p>
 
-            <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-gray-300 md:text-base">
-              Support the work, projects, and creative journey. Every contribution
-              helps fuel independent creators.
-            </p>
+            {currentUser.bio && currentUser.bio.trim() ? (
+              <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-gray-300 md:text-base whitespace-pre-line">
+                {currentUser.bio}
+              </p>
+            ) : (
+              <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-gray-300 md:text-base">
+                Support the work, projects, and creative journey. Every contribution
+                helps fuel independent creators.
+              </p>
+            )}
 
             {/* Stats Bar */}
             <div className="mt-8 inline-flex items-center gap-8 rounded-2xl border border-white/10 bg-white/3 px-8 py-4">
@@ -296,7 +348,7 @@ const PaymentPage = ({ username }) => {
                 Recent Supporters
               </h2>
               <p className="mt-1 text-xs text-gray-400">
-                People who believe in @{username}'s vision.
+                People who believe in @{username}&apos;s vision.
               </p>
             </div>
 
@@ -351,7 +403,7 @@ const PaymentPage = ({ username }) => {
 
                       {payment.message && (
                         <p className="mt-3 rounded-xl bg-black/30 px-3 py-2 text-xs text-gray-300 leading-relaxed italic">
-                          "{payment.message}"
+                          &ldquo;{payment.message}&rdquo;
                         </p>
                       )}
                     </div>

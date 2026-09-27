@@ -49,7 +49,7 @@ const About = () => {
 
             <div className="space-y-4 text-sm text-gray-300 leading-relaxed">
               <p>
-                Many of the web's best software, art, writing, music, and tools start
+                Many of the web&apos;s best software, art, writing, music, and tools start
                 as small side passions. Traditional crowdfunding platforms impose steep
                 fees, all-or-nothing campaign goals, and complex bureaucracy.
               </p>
@@ -113,20 +113,20 @@ const About = () => {
             Ready to be part of the club?
           </h2>
           <p className="mt-3 text-sm text-gray-400">
-            Create your page in seconds and start receiving support from people who value your work.
+            Create your page in seconds or discover creators to back today.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
             <Link
-              href="/login"
+              href="/creators"
               className="px-8 py-3.5 rounded-xl bg-linear-to-r from-amber-400 to-orange-500 hover:opacity-95 text-black font-bold transition-all duration-200 shadow-lg shadow-orange-500/20"
             >
-              Join The Brew Club →
+              Discover Creators →
             </Link>
             <Link
-              href="/"
+              href="/login"
               className="px-8 py-3.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-white font-semibold transition-all duration-200"
             >
-              Back to Home
+              Join The Brew Club
             </Link>
           </div>
         </div>

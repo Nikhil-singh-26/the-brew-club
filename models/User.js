@@ -8,6 +8,7 @@ const UserSchema = new Schema(
     username: { type: String, required: true, unique: true, index: true },
     profilepic: { type: String, default: "" },
     coverpic: { type: String, default: "" },
+    bio: { type: String, default: "" },
     razorpayid: { type: String, default: "" },
     razorpaysecret: { type: String, default: "" },
   },

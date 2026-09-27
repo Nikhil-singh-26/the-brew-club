@@ -86,6 +86,7 @@ export const fetchuser = async (username) => {
       email: isOwner ? u.email : undefined,
       profilepic: u.profilepic || "",
       coverpic: u.coverpic || "",
+      bio: u.bio || "",
       razorpayid: u.razorpayid || "",
       razorpaysecret: isOwner ? u.razorpaysecret || "" : undefined,
     };
@@ -163,6 +164,7 @@ export const updateProfile = async (data, oldusername) => {
       "privacy",
       "explore",
       "home",
+      "creators",
       "favicon.ico",
     ];
     if (reservedUsernames.includes(newUsername)) {
@@ -217,6 +219,8 @@ export const updateProfile = async (data, oldusername) => {
 
     const updatedName =
       typeof ndata.name === "string" ? ndata.name.trim() : currentUser.name;
+    const updatedBio =
+      typeof ndata.bio === "string" ? ndata.bio.trim() : (currentUser.bio || "");
     const updatedRazorpayId =
       typeof ndata.razorpayid === "string" ? ndata.razorpayid.trim() : currentUser.razorpayid;
     const updatedRazorpaySecret =
@@ -228,6 +232,7 @@ export const updateProfile = async (data, oldusername) => {
         $set: {
           name: updatedName,
           username: newUsername,
+          bio: updatedBio,
           profilepic: trimmedProfilePic,
           coverpic: trimmedCoverPic,
           razorpayid: updatedRazorpayId,
@@ -243,6 +248,7 @@ export const updateProfile = async (data, oldusername) => {
       user: {
         name: updatedName,
         username: newUsername,
+        bio: updatedBio,
         profilepic: trimmedProfilePic,
         coverpic: trimmedCoverPic,
         razorpayid: updatedRazorpayId,
@@ -251,5 +257,68 @@ export const updateProfile = async (data, oldusername) => {
   } catch (error) {
     console.error("Error in updateProfile:", error);
     return { error: error.message || "Failed to update profile." };
+  }
+};
+
+export const fetchCreators = async ({ search = "", skip = 0, limit = 10 } = {}) => {
+  try {
+    await connectDb();
+
+    const sanitizedSkip = Math.max(0, parseInt(skip, 10) || 0);
+    const sanitizedLimit = Math.min(50, Math.max(1, parseInt(limit, 10) || 10));
+    const sanitizedSearch = typeof search === "string" ? search.trim() : "";
+
+    const query = {
+      username: { $exists: true, $ne: "" },
+    };
+
+    if (sanitizedSearch) {
+      const escaped = sanitizedSearch.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const searchRegex = new RegExp(escaped, "i");
+      query.$or = [
+        { username: searchRegex },
+        { name: searchRegex },
+        { bio: searchRegex },
+      ];
+    }
+
+    const total = await User.countDocuments(query);
+    const rawCreators = await User.find(query)
+      .sort({ createdAt: -1 })
+      .skip(sanitizedSkip)
+      .limit(sanitizedLimit)
+      .select("name username profilepic coverpic bio createdAt razorpayid")
+      .lean();
+
+    const creators = rawCreators.map((u) => ({
+      _id: u._id.toString(),
+      name: u.name || "",
+      username: u.username,
+      profilepic: u.profilepic || "",
+      coverpic: u.coverpic || "",
+      bio: u.bio || "",
+      createdAt: u.createdAt ? u.createdAt.toISOString() : null,
+      hasPaymentConfigured: Boolean(u.razorpayid),
+    }));
+
+    return {
+      success: true,
+      creators,
+      total,
+      hasMore: sanitizedSkip + creators.length < total,
+      skip: sanitizedSkip,
+      limit: sanitizedLimit,
+    };
+  } catch (error) {
+    console.error("Error in fetchCreators:", error);
+    return {
+      success: false,
+      error: "Failed to fetch creators.",
+      creators: [],
+      total: 0,
+      hasMore: false,
+      skip: 0,
+      limit: 10,
+    };
   }
 };

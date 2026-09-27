@@ -34,17 +34,18 @@ export default function Home() {
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
             <Link
-              href="/login"
-              className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-linear-to-r from-amber-400 to-orange-500 hover:opacity-95 text-black font-bold transition-all duration-200 hover:-translate-y-0.5 shadow-lg shadow-orange-500/20 text-center"
+              href="/creators"
+              className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-linear-to-r from-amber-400 to-orange-500 hover:opacity-95 text-black font-bold transition-all duration-200 hover:-translate-y-0.5 shadow-lg shadow-orange-500/20 text-center flex items-center justify-center gap-2"
             >
-              Start Your Creator Page →
+              <span>✨</span>
+              <span>Discover Creators →</span>
             </Link>
 
             <Link
-              href="/about"
+              href="/login"
               className="w-full sm:w-auto px-8 py-3.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-white font-semibold transition-all duration-200 text-center"
             >
-              Explore How It Works
+              Start Your Creator Page
             </Link>
           </div>
 
@@ -64,7 +65,7 @@ export default function Home() {
             Designed for genuine creator connections
           </h2>
           <p className="mt-3 text-sm text-gray-400">
-            Everything you need to turn your supporters' appreciation into sustainable creative momentum.
+            Everything you need to turn your supporters&apos; appreciation into sustainable creative momentum.
           </p>
         </div>
 
@@ -110,12 +111,40 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Discover Creators Section */}
+      <section className="px-6 pb-20">
+        <div className="max-w-6xl mx-auto rounded-3xl border border-amber-400/20 bg-linear-to-b from-amber-500/10 via-white/2 to-transparent p-8 sm:p-14">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+            <div className="max-w-xl text-center md:text-left">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-amber-400/30 bg-amber-400/10 text-xs font-semibold text-amber-300 mb-4">
+                <span>✨</span> Supporter Discovery
+              </div>
+              <h2 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
+                Discover creators worth supporting
+              </h2>
+              <p className="mt-4 text-sm text-gray-300 leading-relaxed">
+                The Brew Club helps people discover creators and support the work they&apos;re building. Explore builders, artists, writers, and makers funding their craft directly.
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-4 shrink-0">
+              <Link
+                href="/creators"
+                className="px-8 py-3.5 rounded-xl bg-linear-to-r from-amber-400 to-orange-500 hover:opacity-95 text-black font-bold transition-all duration-200 hover:-translate-y-0.5 shadow-lg shadow-orange-500/20 text-center"
+              >
+                Browse All Creators →
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Quote Banner */}
       <section className="px-6 pb-20">
         <div className="max-w-4xl mx-auto rounded-3xl border border-white/10 bg-linear-to-br from-amber-500/10 via-white/2 to-transparent p-8 sm:p-12 text-center">
           <span className="text-3xl">☕</span>
           <p className="mt-4 text-xl sm:text-2xl font-medium text-gray-200 leading-relaxed">
-            "A small vote of confidence from a supporter can be the exact spark that turns a side project into something extraordinary."
+            &ldquo;A small vote of confidence from a supporter can be the exact spark that turns a side project into something extraordinary.&rdquo;
           </p>
           <p className="mt-4 text-xs font-semibold text-amber-400 uppercase tracking-widest">
             The Brew Club Mission
@@ -132,12 +161,20 @@ export default function Home() {
           <p className="mt-4 text-sm text-gray-400">
             Join other passionate builders, creators, and artists who are funded by their own community.
           </p>
-          <Link
-            href="/login"
-            className="inline-block mt-8 px-8 py-3.5 rounded-xl bg-linear-to-r from-amber-400 to-orange-500 hover:opacity-95 text-black font-bold transition-all duration-200 hover:-translate-y-0.5 shadow-lg shadow-orange-500/20"
-          >
-            Get Started with The Brew Club →
-          </Link>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
+            <Link
+              href="/login"
+              className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-linear-to-r from-amber-400 to-orange-500 hover:opacity-95 text-black font-bold transition-all duration-200 hover:-translate-y-0.5 shadow-lg shadow-orange-500/20"
+            >
+              Get Started with The Brew Club →
+            </Link>
+            <Link
+              href="/creators"
+              className="w-full sm:w-auto px-8 py-3.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-white font-semibold transition-all duration-200 text-center"
+            >
+              Explore Creators
+            </Link>
+          </div>
         </div>
       </section>
     </main>

@@ -28,7 +28,23 @@ const Navbar = () => {
         </Link>
 
         {/* Center / Right Links */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 sm:gap-6">
+          <nav className="flex items-center gap-4 sm:gap-6 text-sm font-medium">
+            <Link
+              href="/creators"
+              className="text-gray-300 hover:text-amber-300 transition flex items-center gap-1.5"
+            >
+              <span>✨</span>
+              <span>Creators</span>
+            </Link>
+            <Link
+              href="/about"
+              className="hidden sm:block text-gray-300 hover:text-white transition"
+            >
+              About
+            </Link>
+          </nav>
+
           {session ? (
             <div className="relative">
               <button
@@ -125,6 +141,20 @@ const Navbar = () => {
                           <p className="font-medium">Your Creator Page</p>
                           <p className="text-[11px] text-gray-400">
                             Public supporter link
+                          </p>
+                        </div>
+                      </Link>
+
+                      <Link
+                        href="/creators"
+                        onClick={() => setShowDropdown(false)}
+                        className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition"
+                      >
+                        <span>✨</span>
+                        <div>
+                          <p className="font-medium">Discover Creators</p>
+                          <p className="text-[11px] text-gray-400">
+                            Explore creators to support
                           </p>
                         </div>
                       </Link>

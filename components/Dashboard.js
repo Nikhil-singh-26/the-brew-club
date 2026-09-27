@@ -15,6 +15,7 @@ const Dashboard = () => {
     name: "",
     email: "",
     username: "",
+    bio: "",
     profilepic: "",
     coverpic: "",
     razorpayid: "",
@@ -39,6 +40,7 @@ const Dashboard = () => {
               name: user.name || "",
               email: session.user.email || user.email || "",
               username: user.username || session.user.name || "",
+              bio: user.bio || "",
               profilepic: user.profilepic || "",
               coverpic: user.coverpic || "",
               razorpayid: user.razorpayid || "",
@@ -90,6 +92,7 @@ const Dashboard = () => {
             ...prev,
             name: res.user.name,
             username: res.user.username,
+            bio: res.user.bio || "",
             profilepic: res.user.profilepic,
             coverpic: res.user.coverpic,
             razorpayid: res.user.razorpayid,
@@ -275,6 +278,28 @@ const Dashboard = () => {
                 />
                 <p className="mt-2 text-xs text-gray-500">
                   Direct image URL for your avatar.
+                </p>
+              </div>
+
+              {/* Bio / What you're building */}
+              <div className="md:col-span-2">
+                <label
+                  htmlFor="bio"
+                  className="mb-2 block text-sm font-medium text-gray-300"
+                >
+                  Creator Bio & Mission
+                </label>
+                <textarea
+                  value={form.bio}
+                  onChange={handleChange}
+                  name="bio"
+                  id="bio"
+                  rows={3}
+                  placeholder="Tell supporters what you are building, creating, or sharing..."
+                  className="w-full resize-none rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400/60 focus:bg-black/50 focus:ring-2 focus:ring-amber-400/10"
+                />
+                <p className="mt-2 text-xs text-gray-500">
+                  Displayed on your creator cards and public profile to help supporters discover your work.
                 </p>
               </div>
 
