@@ -112,10 +112,10 @@ const CreatorsList = ({
 
   return (
     <div className="w-full">
-      {/* Search Bar Section */}
+      {/* Search & Filter Bar */}
       <div className="mx-auto max-w-2xl mb-10">
         <div className="relative">
-          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-[#77736B]">
+          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-[#918B80]">
             <svg
               className="h-4 w-4"
               fill="none"
@@ -137,17 +137,17 @@ const CreatorsList = ({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search creators by name, handle, stack, or bio..."
-            className="w-full rounded-[7px] border border-[#34322C] bg-[#201F1B] py-3 pl-10 pr-10 text-sm text-[#F4F0E8] outline-none transition placeholder:text-[#77736B] focus:border-[#C96F43] focus:ring-1 focus:ring-[#C96F43]/40"
+            className="w-full rounded-[8px] border border-[#DED8CE] bg-[#FFFFFF] py-3 pl-10 pr-10 text-sm text-[#1E1D1A] shadow-xs outline-none transition placeholder:text-[#918B80] focus:border-[#C86B3C] focus:ring-2 focus:ring-[#C86B3C]/20"
           />
 
           {searchQuery && (
             <button
               onClick={handleClearSearch}
-              className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-[#77736B] hover:text-[#F4F0E8] transition cursor-pointer"
+              className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-[#918B80] hover:text-[#1E1D1A] transition cursor-pointer"
               title="Clear search"
               aria-label="Clear search"
             >
-              <span className="flex h-5 w-5 items-center justify-center rounded-[4px] bg-[#282721] text-xs">
+              <span className="flex h-5 w-5 items-center justify-center rounded-[4px] bg-[#F0ECE4] text-xs">
                 ✕
               </span>
             </button>
@@ -156,16 +156,16 @@ const CreatorsList = ({
 
         {/* Skill Filter Chips */}
         <div className="mt-3 flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
-          <span className="text-xs text-[#77736B] mr-1 shrink-0 font-medium">Filter:</span>
+          <span className="text-xs text-[#918B80] mr-1 shrink-0 font-medium">Filter:</span>
           {SKILL_FILTERS.map((skill) => (
             <button
               key={skill}
               type="button"
               onClick={() => setSelectedSkill(skill)}
-              className={`rounded-[6px] px-2.5 py-1 text-xs font-medium transition shrink-0 cursor-pointer ${
+              className={`rounded-[6px] px-2.5 py-1 text-xs font-medium transition shrink-0 cursor-pointer shadow-xs ${
                 selectedSkill === skill
-                  ? "bg-[#C96F43] text-white border border-[#C96F43]"
-                  : "bg-[#201F1B] border border-[#34322C] text-[#AAA59A] hover:text-[#F4F0E8] hover:bg-[#282721]"
+                  ? "bg-[#C86B3C] text-white border border-[#C86B3C]"
+                  : "bg-[#FFFFFF] border border-[#DED8CE] text-[#6F6A60] hover:text-[#1E1D1A] hover:bg-[#F0ECE4]"
               }`}
             >
               {skill === "All" ? "All Skills" : skill}
@@ -173,18 +173,18 @@ const CreatorsList = ({
           ))}
         </div>
 
-        {/* Search Status */}
-        <div className="mt-3 flex items-center justify-between px-1 text-xs text-[#AAA59A]">
+        {/* Search Status / Active filter note */}
+        <div className="mt-3 flex items-center justify-between px-1 text-xs text-[#6F6A60]">
           <div>
             {searching ? (
-              <span className="flex items-center gap-2 text-[#C96F43]">
-                <span className="h-3 w-3 animate-spin rounded-full border border-[#C96F43]/30 border-t-[#C96F43]" />
+              <span className="flex items-center gap-2 text-[#C86B3C]">
+                <span className="h-3 w-3 animate-spin rounded-full border border-[#C86B3C]/30 border-t-[#C86B3C]" />
                 Searching creators...
               </span>
             ) : debouncedSearch || selectedSkill !== "All" ? (
               <span>
                 Found {total} {total === 1 ? "creator" : "creators"} for &ldquo;
-                <span className="text-[#F4F0E8] font-medium">
+                <span className="text-[#1E1D1A] font-semibold">
                   {debouncedSearch || selectedSkill}
                 </span>
                 &rdquo;
@@ -197,7 +197,7 @@ const CreatorsList = ({
           {(debouncedSearch || selectedSkill !== "All") && (
             <button
               onClick={handleClearSearch}
-              className="text-[#C96F43] hover:text-[#D98255] transition text-xs cursor-pointer font-medium"
+              className="text-[#C86B3C] hover:text-[#A9552F] transition text-xs cursor-pointer font-medium"
             >
               Reset filters
             </button>
@@ -208,37 +208,37 @@ const CreatorsList = ({
       {/* Creators Grid */}
       {creators.length > 0 ? (
         <>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {creators.map((creator) => (
               <CreatorCard key={creator._id || creator.username} creator={creator} />
             ))}
           </div>
 
-          {/* View More / End of List State */}
-          <div className="mt-12 flex flex-col items-center justify-center text-center">
+          {/* View More / End of Directory */}
+          <div className="mt-14 flex flex-col items-center justify-center text-center">
             {hasMore ? (
               <button
                 type="button"
                 onClick={handleViewMore}
                 disabled={loadingMore}
-                className="group inline-flex items-center gap-2 rounded-[7px] border border-[#34322C] bg-[#201F1B] px-6 py-2.5 text-xs font-medium text-[#F4F0E8] transition-colors hover:bg-[#282721] hover:border-[#77736B]/50 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+                className="group inline-flex items-center gap-2 rounded-[7px] border border-[#DED8CE] bg-[#FFFFFF] px-6 py-2.5 text-xs font-medium text-[#1E1D1A] shadow-xs transition hover:bg-[#F0ECE4] hover:border-[#C5BDB0] hover:shadow-sm disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
               >
                 {loadingMore ? (
                   <>
-                    <span className="h-3.5 w-3.5 animate-spin rounded-full border border-[#F4F0E8]/30 border-t-[#C96F43]" />
+                    <span className="h-3.5 w-3.5 animate-spin rounded-full border border-[#1E1D1A]/30 border-t-[#C86B3C]" />
                     <span>Loading creators...</span>
                   </>
                 ) : (
                   <>
                     <span>View more creators</span>
-                    <span className="text-[#C96F43] transition-transform duration-200 group-hover:translate-y-0.5">
+                    <span className="text-[#C86B3C] transition-transform duration-200 group-hover:translate-y-0.5">
                       ↓
                     </span>
                   </>
                 )}
               </button>
             ) : (
-              <div className="text-xs text-[#77736B]">
+              <div className="text-xs text-[#918B80]">
                 You&apos;ve reached the end of the creator directory.
               </div>
             )}
@@ -246,31 +246,35 @@ const CreatorsList = ({
         </>
       ) : (
         /* Empty State */
-        <div className="mx-auto max-w-md rounded-[10px] border border-[#34322C] bg-[#201F1B] p-8 text-center">
-          <h3 className="font-heading text-base font-semibold text-[#F4F0E8]">
+        <div className="mx-auto max-w-md rounded-[10px] border border-[#DED8CE] bg-[#FFFFFF] p-8 text-center shadow-xs">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-[8px] bg-[#F5E8E0] text-xl mb-3 text-[#C86B3C]">
+            ☕
+          </div>
+
+          <h3 className="font-heading text-base font-bold text-[#1E1D1A]">
             {debouncedSearch || selectedSkill !== "All"
               ? "No matching creators found"
               : "No creators registered yet"}
           </h3>
 
-          <p className="mt-2 text-xs text-[#AAA59A] leading-relaxed">
+          <p className="mt-2 text-xs text-[#6F6A60] leading-relaxed">
             {debouncedSearch || selectedSkill !== "All"
-              ? "We couldn't find any creator matching your query. Try adjusting your search or clearing your skill filters."
-              : "Be among the first creators to set up a profile and share your creative journey on The Brew Club."}
+              ? "We couldn't find any creators matching your search. Try broadening your query or selecting another skill."
+              : "Be the first creator to launch your portfolio page and receive backing from supporters."}
           </p>
 
           <div className="mt-5 flex items-center justify-center gap-3">
             {debouncedSearch || selectedSkill !== "All" ? (
               <button
                 onClick={handleClearSearch}
-                className="rounded-[7px] bg-[#C96F43] hover:bg-[#D98255] px-4 py-2 text-xs font-medium text-white transition-colors cursor-pointer"
+                className="rounded-[7px] bg-[#C86B3C] hover:bg-[#A9552F] px-4 py-2 text-xs font-medium text-white shadow-xs transition cursor-pointer"
               >
                 Clear filters
               </button>
             ) : (
               <Link
                 href="/join"
-                className="rounded-[7px] bg-[#C96F43] hover:bg-[#D98255] px-4 py-2 text-xs font-medium text-white transition-colors"
+                className="rounded-[7px] bg-[#C86B3C] hover:bg-[#A9552F] px-4 py-2 text-xs font-medium text-white shadow-xs transition"
               >
                 Start your creator page →
               </Link>

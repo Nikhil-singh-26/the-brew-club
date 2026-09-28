@@ -25,7 +25,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${instrumentSans.variable} ${inter.variable}`}>
-      <body className="bg-[#171613] text-[#F4F0E8] min-h-screen flex flex-col antialiased selection:bg-[#C96F43] selection:text-[#171613]">
+      <body className="bg-[#F7F4EE] text-[#1E1D1A] min-h-screen flex flex-col antialiased selection:bg-[#F5E8E0] selection:text-[#C86B3C]">
         <SessionWrapper>
           <Navbar />
           <div className="flex-1">

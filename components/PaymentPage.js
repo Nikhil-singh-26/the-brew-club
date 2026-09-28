@@ -16,12 +16,24 @@ import {
 import { useSearchParams, useRouter } from "next/navigation";
 import { useToast } from "./Toast";
 
+const getRelativeTime = (dateString) => {
+  if (!dateString) return "Supporter";
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffInSeconds = Math.floor((now - date) / 1000);
+  if (diffInSeconds < 60) return "Just now";
+  if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+  if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
+  if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 86400)}d ago`;
+  return date.toLocaleDateString("en-IN", { month: "short", day: "numeric" });
+};
+
 const PaymentPage = ({ username, initialUser = null, initialPayments = [] }) => {
   const { data: session } = useSession();
   const [paymentform, setPaymentform] = useState({
     name: "",
     message: "",
-    amount: "100",
+    amount: "50",
     isAnonymous: false,
   });
 
@@ -69,6 +81,7 @@ const PaymentPage = ({ username, initialUser = null, initialPayments = [] }) => 
 
         const dbpayments = await fetchpayments(username);
         if (!isMounted) return;
+        // ONLY verified payments where done is true are returned by fetchpayments
         setPayments(dbpayments || []);
       } catch (error) {
         console.error("Failed to load creator data:", error);
@@ -108,7 +121,7 @@ const PaymentPage = ({ username, initialUser = null, initialPayments = [] }) => 
         isMounted = false;
       };
     } else if (paymentStatus === "failed") {
-      toast.error("Payment verification could not be completed.");
+      toast.error("Payment was not completed or verification failed.");
       router.replace(`/${username}`);
     }
   }, [searchParams, router, username, toast]);
@@ -271,7 +284,7 @@ const PaymentPage = ({ username, initialUser = null, initialPayments = [] }) => 
           isAnonymous: String(paymentform.isAnonymous),
         },
         theme: {
-          color: "#C96F43",
+          color: "#C86B3C",
         },
       };
 
@@ -301,11 +314,11 @@ const PaymentPage = ({ username, initialUser = null, initialPayments = [] }) => 
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-[#171613] text-[#F4F0E8]">
+      <main className="min-h-screen bg-[#F7F4EE] text-[#1E1D1A]">
         <div className="flex min-h-[70vh] items-center justify-center">
           <div className="flex flex-col items-center gap-3">
-            <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#34322C] border-t-[#C96F43]" />
-            <p className="text-xs text-[#AAA59A]">Loading creator page...</p>
+            <div className="h-7 w-7 animate-spin rounded-full border-2 border-[#DED8CE] border-t-[#C86B3C]" />
+            <p className="text-xs text-[#6F6A60]">Loading creator profile...</p>
           </div>
         </div>
       </main>
@@ -314,22 +327,25 @@ const PaymentPage = ({ username, initialUser = null, initialPayments = [] }) => 
 
   if (!currentUser) {
     return (
-      <main className="min-h-screen bg-[#171613] text-[#F4F0E8] flex items-center justify-center px-6">
-        <div className="text-center max-w-md">
-          <h1 className="font-heading text-2xl font-bold">Creator Not Found</h1>
-          <p className="mt-2 text-xs text-[#AAA59A]">
-            The creator @{username} doesn&apos;t seem to exist on The Brew Club yet.
+      <main className="min-h-screen bg-[#F7F4EE] text-[#1E1D1A] flex items-center justify-center px-6">
+        <div className="text-center max-w-md rounded-[12px] border border-[#DED8CE] bg-[#FFFFFF] p-8 shadow-xs">
+          <div className="h-12 w-12 rounded-[8px] bg-[#F5E8E0] text-[#C86B3C] text-xl flex items-center justify-center mx-auto mb-3">
+            🔍
+          </div>
+          <h1 className="font-heading text-xl font-bold">Creator Not Found</h1>
+          <p className="mt-2 text-xs text-[#6F6A60]">
+            The creator @{username} doesn&apos;t exist on The Brew Club yet.
           </p>
           <div className="flex items-center justify-center gap-3 mt-6">
             <Link
               href="/creators"
-              className="rounded-[7px] bg-[#C96F43] hover:bg-[#D98255] px-4 py-2 text-xs font-medium text-white transition-colors"
+              className="rounded-[7px] bg-[#C86B3C] hover:bg-[#A9552F] px-4 py-2 text-xs font-medium text-white shadow-xs transition"
             >
               Discover creators
             </Link>
             <Link
               href="/"
-              className="rounded-[7px] border border-[#34322C] bg-[#201F1B] hover:bg-[#282721] px-4 py-2 text-xs font-medium text-[#F4F0E8] transition-colors"
+              className="rounded-[7px] border border-[#DED8CE] bg-[#FFFFFF] hover:bg-[#F0ECE4] px-4 py-2 text-xs font-medium text-[#1E1D1A] transition"
             >
               Back to home
             </Link>
@@ -373,9 +389,9 @@ const PaymentPage = ({ username, initialUser = null, initialPayments = [] }) => 
         onLoad={() => setScriptLoaded(true)}
       />
 
-      <main className="min-h-screen bg-[#171613] text-[#F4F0E8] pb-24">
-        {/* Cover Banner (Restrained) */}
-        <div className="h-44 w-full overflow-hidden bg-[#201F1B] border-b border-[#34322C] md:h-60 relative">
+      <main className="min-h-screen bg-[#F7F4EE] text-[#1E1D1A] pb-24">
+        {/* Cover Banner with visual depth */}
+        <div className="h-44 w-full overflow-hidden bg-linear-to-r from-[#F0ECE4] via-[#EAE5DC] to-[#F5E8E0] border-b border-[#DED8CE] md:h-64 relative">
           {currentUser.coverpic ? (
             <img
               src={currentUser.coverpic}
@@ -383,19 +399,20 @@ const PaymentPage = ({ username, initialUser = null, initialPayments = [] }) => 
               onError={(e) => {
                 e.currentTarget.style.display = "none";
               }}
-              className="h-full w-full object-cover opacity-70"
+              className="h-full w-full object-cover opacity-90"
             />
           ) : (
-            <div className="h-full w-full bg-[#201F1B]" />
+            <div className="h-full w-full bg-linear-to-br from-[#F5E8E0]/40 via-[#F0ECE4] to-[#EAE5DC]" />
           )}
+          <div className="absolute inset-0 bg-linear-to-t from-[#1E1D1A]/10 via-transparent to-transparent" />
         </div>
 
         {/* Creator Header Section */}
-        <div className="mx-auto max-w-4xl px-6">
-          <div className="relative -mt-12 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 pb-8 border-b border-[#34322C]">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6">
+          <div className="relative -mt-14 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 pb-8 border-b border-[#DED8CE]">
             {/* Avatar + Main Identity */}
             <div className="flex items-end gap-4">
-              <div className="h-24 w-24 rounded-[10px] border-2 border-[#171613] bg-[#201F1B] overflow-hidden shrink-0 shadow-md">
+              <div className="h-28 w-28 rounded-[12px] border-4 border-[#FFFFFF] bg-[#F0ECE4] overflow-hidden shrink-0 shadow-md">
                 {currentUser.profilepic ? (
                   <img
                     src={currentUser.profilepic}
@@ -410,28 +427,35 @@ const PaymentPage = ({ username, initialUser = null, initialPayments = [] }) => 
                 ) : null}
                 <div
                   style={{ display: currentUser.profilepic ? "none" : "flex" }}
-                  className="creator-avatar-fallback h-full w-full items-center justify-center bg-[#282721] text-2xl font-bold text-[#E9DFD0]"
+                  className="creator-avatar-fallback h-full w-full items-center justify-center bg-[#F5E8E0] text-3xl font-bold text-[#C86B3C]"
                 >
                   {initial}
                 </div>
               </div>
 
               <div className="pt-2">
-                <h1 className="font-heading text-2xl sm:text-3xl font-bold text-[#F4F0E8] tracking-tight">
-                  {displayName}
-                </h1>
-                <p className="text-xs font-medium text-[#C96F43]">
+                <div className="flex items-center gap-2">
+                  <h1 className="font-heading text-2xl sm:text-3xl font-bold text-[#1E1D1A] tracking-tight">
+                    {displayName}
+                  </h1>
+                  {currentUser.hasPaymentConfigured && (
+                    <span className="rounded-[4px] bg-[#557A5C]/15 text-[#557A5C] px-1.5 py-0.5 text-[10px] font-semibold">
+                      Accepts Backing
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs font-semibold text-[#C86B3C]">
                   @{username}
                 </p>
               </div>
             </div>
 
-            {/* Top Creator Actions */}
+            {/* Top Actions */}
             <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={() => setShowShareModal(true)}
-                className="rounded-[6px] border border-[#34322C] bg-[#201F1B] px-3 py-1.5 text-xs font-medium text-[#AAA59A] hover:text-[#F4F0E8] hover:bg-[#282721] transition-colors cursor-pointer"
+                className="rounded-[7px] border border-[#DED8CE] bg-[#FFFFFF] px-3.5 py-1.5 text-xs font-medium text-[#6F6A60] hover:text-[#1E1D1A] hover:bg-[#F0ECE4] shadow-xs transition cursor-pointer"
                 title="Share profile"
               >
                 Share
@@ -441,21 +465,21 @@ const PaymentPage = ({ username, initialUser = null, initialPayments = [] }) => 
                 type="button"
                 onClick={handleToggleSave}
                 disabled={savingBookmark}
-                className={`rounded-[6px] border px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer ${
+                className={`rounded-[7px] border px-3.5 py-1.5 text-xs font-medium shadow-xs transition cursor-pointer ${
                   isSaved
-                    ? "border-[#C96F43]/40 bg-[#C96F43]/15 text-[#C96F43]"
-                    : "border-[#34322C] bg-[#201F1B] text-[#AAA59A] hover:text-[#F4F0E8] hover:bg-[#282721]"
+                    ? "border-[#C86B3C]/30 bg-[#F5E8E0] text-[#C86B3C]"
+                    : "border-[#DED8CE] bg-[#FFFFFF] text-[#6F6A60] hover:text-[#1E1D1A] hover:bg-[#F0ECE4]"
                 }`}
-                title={isSaved ? "Saved" : "Save creator"}
+                title={isSaved ? "Saved" : "Bookmark creator"}
               >
-                {isSaved ? "Saved" : "Save"}
+                {isSaved ? "Saved 🔖" : "Save"}
               </button>
             </div>
           </div>
 
-          {/* Bio & Social Links */}
-          <div className="py-6 border-b border-[#34322C]">
-            <p className="text-sm leading-relaxed text-[#AAA59A] max-w-2xl">
+          {/* Bio, Skills & Social Links */}
+          <div className="py-6 border-b border-[#DED8CE]">
+            <p className="text-sm leading-relaxed text-[#1E1D1A] max-w-3xl">
               {currentUser.bio && currentUser.bio.trim()
                 ? currentUser.bio
                 : "Independent creator building and sharing creative work on The Brew Club."}
@@ -467,9 +491,9 @@ const PaymentPage = ({ username, initialUser = null, initialPayments = [] }) => 
                 {validSkills.map((skill, index) => (
                   <span
                     key={index}
-                    className="rounded-[6px] border border-[#34322C] bg-[#201F1B] px-2.5 py-0.5 text-xs text-[#AAA59A]"
+                    className="rounded-[5px] border border-[#DED8CE] bg-[#FFFFFF] px-2.5 py-0.5 text-xs text-[#6F6A60] shadow-xs"
                   >
-                    {skill}
+                    #{skill}
                   </span>
                 ))}
               </div>
@@ -483,7 +507,7 @@ const PaymentPage = ({ username, initialUser = null, initialPayments = [] }) => 
                     href={social.github}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="rounded-[6px] border border-[#34322C] bg-[#201F1B] px-2.5 py-1 text-xs text-[#AAA59A] hover:text-[#F4F0E8] hover:bg-[#282721] transition-colors"
+                    className="rounded-[6px] border border-[#DED8CE] bg-[#FFFFFF] px-2.5 py-1 text-xs text-[#6F6A60] hover:text-[#1E1D1A] hover:bg-[#F0ECE4] shadow-xs transition"
                   >
                     GitHub ↗
                   </a>
@@ -493,7 +517,7 @@ const PaymentPage = ({ username, initialUser = null, initialPayments = [] }) => 
                     href={social.linkedin}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="rounded-[6px] border border-[#34322C] bg-[#201F1B] px-2.5 py-1 text-xs text-[#AAA59A] hover:text-[#F4F0E8] hover:bg-[#282721] transition-colors"
+                    className="rounded-[6px] border border-[#DED8CE] bg-[#FFFFFF] px-2.5 py-1 text-xs text-[#6F6A60] hover:text-[#1E1D1A] hover:bg-[#F0ECE4] shadow-xs transition"
                   >
                     LinkedIn ↗
                   </a>
@@ -503,7 +527,7 @@ const PaymentPage = ({ username, initialUser = null, initialPayments = [] }) => 
                     href={social.portfolio}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="rounded-[6px] border border-[#34322C] bg-[#201F1B] px-2.5 py-1 text-xs text-[#AAA59A] hover:text-[#F4F0E8] hover:bg-[#282721] transition-colors"
+                    className="rounded-[6px] border border-[#DED8CE] bg-[#FFFFFF] px-2.5 py-1 text-xs text-[#6F6A60] hover:text-[#1E1D1A] hover:bg-[#F0ECE4] shadow-xs transition"
                   >
                     Portfolio ↗
                   </a>
@@ -513,7 +537,7 @@ const PaymentPage = ({ username, initialUser = null, initialPayments = [] }) => 
                     href={social.twitter}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="rounded-[6px] border border-[#34322C] bg-[#201F1B] px-2.5 py-1 text-xs text-[#AAA59A] hover:text-[#F4F0E8] hover:bg-[#282721] transition-colors"
+                    className="rounded-[6px] border border-[#DED8CE] bg-[#FFFFFF] px-2.5 py-1 text-xs text-[#6F6A60] hover:text-[#1E1D1A] hover:bg-[#F0ECE4] shadow-xs transition"
                   >
                     X (Twitter) ↗
                   </a>
@@ -523,7 +547,7 @@ const PaymentPage = ({ username, initialUser = null, initialPayments = [] }) => 
                     href={social.other}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="rounded-[6px] border border-[#34322C] bg-[#201F1B] px-2.5 py-1 text-xs text-[#AAA59A] hover:text-[#F4F0E8] hover:bg-[#282721] transition-colors"
+                    className="rounded-[6px] border border-[#DED8CE] bg-[#FFFFFF] px-2.5 py-1 text-xs text-[#6F6A60] hover:text-[#1E1D1A] hover:bg-[#F0ECE4] shadow-xs transition"
                   >
                     Website ↗
                   </a>
@@ -532,28 +556,28 @@ const PaymentPage = ({ username, initialUser = null, initialPayments = [] }) => 
             )}
           </div>
 
-          {/* Quick Metrics Bar */}
-          <div className="py-5 flex items-center gap-8 text-xs border-b border-[#34322C]">
+          {/* Quick Metrics Bar (REAL VERIFIED DATA ONLY) */}
+          <div className="py-5 flex items-center gap-8 text-xs border-b border-[#DED8CE]">
             <div>
-              <span className="font-heading text-lg font-bold text-[#F4F0E8] block">
+              <span className="font-heading text-lg font-bold text-[#1E1D1A] block">
                 {payments.length}
               </span>
-              <span className="text-[#77736B]">Supporters</span>
+              <span className="text-[#6F6A60]">Verified Supporters</span>
             </div>
-            <div className="h-6 w-px bg-[#34322C]" />
+            <div className="h-6 w-px bg-[#DED8CE]" />
             <div>
-              <span className="font-heading text-lg font-bold text-[#C96F43] block">
+              <span className="font-heading text-lg font-bold text-[#C86B3C] block">
                 ₹{totalRaised.toLocaleString("en-IN")}
               </span>
-              <span className="text-[#77736B]">Supported</span>
+              <span className="text-[#6F6A60]">Total Supported</span>
             </div>
           </div>
 
           {/* Thank You Note (if creator set one) */}
           {currentUser.thankYouMessage && (
-            <div className="my-8 rounded-[10px] border border-[#34322C] bg-[#201F1B] p-5 text-xs text-[#AAA59A]">
-              <span className="text-[#C96F43] font-medium block mb-1">A note from {displayName}:</span>
-              <p className="italic leading-relaxed text-[#F4F0E8]">
+            <div className="my-8 rounded-[10px] border border-[#DED8CE] bg-[#FFFFFF] p-5 text-xs text-[#6F6A60] shadow-xs">
+              <span className="text-[#C86B3C] font-semibold block mb-1">A note from {displayName}:</span>
+              <p className="italic leading-relaxed text-[#1E1D1A]">
                 &ldquo;{currentUser.thankYouMessage}&rdquo;
               </p>
             </div>
@@ -561,15 +585,15 @@ const PaymentPage = ({ username, initialUser = null, initialPayments = [] }) => 
 
           {/* Content & Support Grid */}
           <div className="mt-10 grid gap-12 lg:grid-cols-12">
-            {/* Left Column: Story, Projects, Achievements (7 cols) */}
+            {/* Left Column: Story, Projects, Achievements, Supporter Wall (7 cols) */}
             <div className="space-y-10 lg:col-span-7">
               {/* About Section */}
               {currentUser.about && currentUser.about.trim() && (
                 <section>
-                  <h2 className="font-heading text-base font-semibold text-[#F4F0E8] mb-3">
-                    About
+                  <h2 className="font-heading text-base font-bold text-[#1E1D1A] mb-3">
+                    About the creator
                   </h2>
-                  <p className="text-xs leading-relaxed text-[#AAA59A] whitespace-pre-line">
+                  <p className="text-xs leading-relaxed text-[#6F6A60] whitespace-pre-line">
                     {currentUser.about}
                   </p>
                 </section>
@@ -577,23 +601,25 @@ const PaymentPage = ({ username, initialUser = null, initialPayments = [] }) => 
 
               {/* What I'm Building */}
               {currentUser.currentWork && currentUser.currentWork.trim() && (
-                <section className="border-t border-[#34322C] pt-8">
-                  <h2 className="font-heading text-base font-semibold text-[#F4F0E8] mb-3">
-                    What I&apos;m building
+                <section className="border-t border-[#DED8CE] pt-8">
+                  <h2 className="font-heading text-base font-bold text-[#1E1D1A] mb-3">
+                    What I&apos;m currently building
                   </h2>
-                  <p className="text-xs leading-relaxed text-[#AAA59A] whitespace-pre-line">
-                    {currentUser.currentWork}
-                  </p>
+                  <div className="rounded-[10px] border border-[#DED8CE] bg-[#FFFFFF] p-5 shadow-xs">
+                    <p className="text-xs leading-relaxed text-[#1E1D1A] whitespace-pre-line font-medium">
+                      {currentUser.currentWork}
+                    </p>
+                  </div>
                 </section>
               )}
 
               {/* Why Support Me */}
               {currentUser.whySupport && currentUser.whySupport.trim() && (
-                <section className="border-t border-[#34322C] pt-8">
-                  <h2 className="font-heading text-base font-semibold text-[#F4F0E8] mb-3">
+                <section className="border-t border-[#DED8CE] pt-8">
+                  <h2 className="font-heading text-base font-bold text-[#1E1D1A] mb-3">
                     Why support my work
                   </h2>
-                  <p className="text-xs leading-relaxed text-[#AAA59A] whitespace-pre-line">
+                  <p className="text-xs leading-relaxed text-[#6F6A60] whitespace-pre-line">
                     {currentUser.whySupport}
                   </p>
                 </section>
@@ -601,33 +627,33 @@ const PaymentPage = ({ username, initialUser = null, initialPayments = [] }) => 
 
               {/* Featured Project */}
               {featuredProject && (
-                <section className="border-t border-[#34322C] pt-8">
-                  <div className="flex items-center justify-between mb-4">
-                    <h2 className="font-heading text-base font-semibold text-[#F4F0E8]">
+                <section className="border-t border-[#DED8CE] pt-8">
+                  <div className="flex items-center justify-between mb-3">
+                    <h2 className="font-heading text-base font-bold text-[#1E1D1A]">
                       Featured project
                     </h2>
-                    <span className="rounded-[6px] border border-[#34322C] bg-[#201F1B] px-2 py-0.5 text-[10px] text-[#AAA59A]">
+                    <span className="rounded-[5px] bg-[#F5E8E0] text-[#C86B3C] px-2 py-0.5 text-[10px] font-semibold">
                       {featuredProject.status || "In Progress"}
                     </span>
                   </div>
 
-                  <div className="rounded-[10px] border border-[#34322C] bg-[#201F1B] p-5">
-                    <h3 className="font-heading text-base font-semibold text-[#F4F0E8]">
+                  <div className="rounded-[10px] border border-[#DED8CE] bg-[#FFFFFF] p-5 shadow-xs space-y-3">
+                    <h3 className="font-heading text-base font-bold text-[#1E1D1A]">
                       {featuredProject.name}
                     </h3>
 
                     {featuredProject.description && (
-                      <p className="mt-2 text-xs leading-relaxed text-[#AAA59A]">
+                      <p className="text-xs leading-relaxed text-[#6F6A60]">
                         {featuredProject.description}
                       </p>
                     )}
 
                     {featuredProject.technologies && featuredProject.technologies.length > 0 && (
-                      <div className="mt-3 flex flex-wrap gap-1">
+                      <div className="flex flex-wrap gap-1">
                         {featuredProject.technologies.map((tech, i) => (
                           <span
                             key={i}
-                            className="rounded-[4px] border border-[#34322C] bg-[#171613] px-1.5 py-0.5 text-[10px] text-[#AAA59A]"
+                            className="rounded-[4px] border border-[#DED8CE] bg-[#F7F4EE] px-1.5 py-0.5 text-[10px] text-[#6F6A60]"
                           >
                             {tech}
                           </span>
@@ -635,13 +661,13 @@ const PaymentPage = ({ username, initialUser = null, initialPayments = [] }) => 
                       </div>
                     )}
 
-                    <div className="mt-4 flex items-center gap-2 pt-3 border-t border-[#34322C]">
+                    <div className="pt-3 flex items-center gap-2 border-t border-[#DED8CE]/60">
                       {featuredProject.live && (
                         <a
                           href={featuredProject.live}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="rounded-[6px] bg-[#C96F43] hover:bg-[#D98255] px-3 py-1 text-xs font-medium text-white transition-colors"
+                          className="rounded-[6px] bg-[#C86B3C] hover:bg-[#A9552F] text-white px-3 py-1 text-xs font-medium shadow-xs transition"
                         >
                           Live Demo ↗
                         </a>
@@ -651,7 +677,7 @@ const PaymentPage = ({ username, initialUser = null, initialPayments = [] }) => 
                           href={featuredProject.github}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="rounded-[6px] border border-[#34322C] bg-[#171613] hover:bg-[#282721] px-3 py-1 text-xs font-medium text-[#F4F0E8] transition-colors"
+                          className="rounded-[6px] border border-[#DED8CE] bg-[#F7F4EE] hover:bg-[#F0ECE4] text-[#1E1D1A] px-3 py-1 text-xs font-medium transition"
                         >
                           GitHub ↗
                         </a>
@@ -663,42 +689,40 @@ const PaymentPage = ({ username, initialUser = null, initialPayments = [] }) => 
 
               {/* Regular Projects */}
               {regularProjects.length > 0 && (
-                <section className="border-t border-[#34322C] pt-8">
-                  <h2 className="font-heading text-base font-semibold text-[#F4F0E8] mb-4">
-                    Other projects
+                <section className="border-t border-[#DED8CE] pt-8">
+                  <h2 className="font-heading text-base font-bold text-[#1E1D1A] mb-4">
+                    Other creations & projects
                   </h2>
 
                   <div className="space-y-3">
                     {regularProjects.map((project, idx) => (
                       <div
                         key={idx}
-                        className="rounded-[10px] border border-[#34322C] bg-[#201F1B] p-4 flex flex-col justify-between"
+                        className="rounded-[10px] border border-[#DED8CE] bg-[#FFFFFF] p-4 shadow-xs"
                       >
-                        <div>
-                          <div className="flex items-center justify-between gap-2">
-                            <h3 className="font-heading text-sm font-semibold text-[#F4F0E8]">
-                              {project.name}
-                            </h3>
-                            <span className="text-[10px] text-[#77736B]">
-                              {project.status || "In Progress"}
-                            </span>
-                          </div>
-
-                          {project.description && (
-                            <p className="mt-1.5 text-xs text-[#AAA59A] leading-relaxed line-clamp-3">
-                              {project.description}
-                            </p>
-                          )}
+                        <div className="flex items-center justify-between gap-2">
+                          <h3 className="font-heading text-sm font-bold text-[#1E1D1A]">
+                            {project.name}
+                          </h3>
+                          <span className="text-[10px] text-[#918B80]">
+                            {project.status || "In Progress"}
+                          </span>
                         </div>
 
+                        {project.description && (
+                          <p className="mt-1.5 text-xs text-[#6F6A60] leading-relaxed line-clamp-3">
+                            {project.description}
+                          </p>
+                        )}
+
                         {(project.live || project.github || project.url) && (
-                          <div className="mt-3 flex items-center gap-2 pt-2 border-t border-[#34322C]">
+                          <div className="mt-3 flex items-center gap-3 pt-2 border-t border-[#DED8CE]/60">
                             {project.live && (
                               <a
                                 href={project.live}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-xs text-[#C96F43] hover:underline"
+                                className="text-xs font-medium text-[#C86B3C] hover:underline"
                               >
                                 Live Demo ↗
                               </a>
@@ -708,19 +732,9 @@ const PaymentPage = ({ username, initialUser = null, initialPayments = [] }) => 
                                 href={project.github}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-xs text-[#AAA59A] hover:text-[#F4F0E8]"
+                                className="text-xs text-[#6F6A60] hover:text-[#1E1D1A]"
                               >
                                 GitHub ↗
-                              </a>
-                            )}
-                            {project.url && !project.live && (
-                              <a
-                                href={project.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-xs text-[#AAA59A] hover:text-[#F4F0E8]"
-                              >
-                                View Link ↗
                               </a>
                             )}
                           </div>
@@ -731,39 +745,46 @@ const PaymentPage = ({ username, initialUser = null, initialPayments = [] }) => 
                 </section>
               )}
 
-              {/* Achievements */}
+              {/* Achievements & Milestones */}
               {validAchievements.length > 0 && (
-                <section className="border-t border-[#34322C] pt-8">
-                  <h2 className="font-heading text-base font-semibold text-[#F4F0E8] mb-3">
+                <section className="border-t border-[#DED8CE] pt-8">
+                  <h2 className="font-heading text-base font-bold text-[#1E1D1A] mb-3">
                     Milestones & Recognition
                   </h2>
                   <ul className="space-y-2">
                     {validAchievements.map((item, idx) => (
                       <li
                         key={idx}
-                        className="rounded-[7px] border border-[#34322C] bg-[#201F1B] px-3.5 py-2 text-xs text-[#AAA59A]"
+                        className="rounded-[7px] border border-[#DED8CE] bg-[#FFFFFF] px-3.5 py-2 text-xs text-[#6F6A60] shadow-xs"
                       >
-                        {item}
+                        🏆 {item}
                       </li>
                     ))}
                   </ul>
                 </section>
               )}
 
-              {/* Recent Supporters Wall */}
-              <section className="border-t border-[#34322C] pt-8">
-                <h2 className="font-heading text-base font-semibold text-[#F4F0E8] mb-1">
-                  Recent support
-                </h2>
-                <p className="text-xs text-[#77736B] mb-4">
-                  Supporters who have backed @{username}.
-                </p>
+              {/* Verified Supporter Wall */}
+              <section className="border-t border-[#DED8CE] pt-8">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h2 className="font-heading text-base font-bold text-[#1E1D1A]">
+                      Recent verified support
+                    </h2>
+                    <p className="text-xs text-[#6F6A60]">
+                      Community members who have backed @{username}.
+                    </p>
+                  </div>
+                  <span className="text-[10px] font-semibold text-[#557A5C] bg-[#557A5C]/15 px-2 py-0.5 rounded-[4px]">
+                    Verified Payments Only
+                  </span>
+                </div>
 
                 {payments.length === 0 ? (
-                  <div className="rounded-[10px] border border-[#34322C] bg-[#201F1B] p-6 text-center">
-                    <p className="text-xs font-medium text-[#F4F0E8]">No support yet.</p>
-                    <p className="mt-1 text-xs text-[#77736B]">
-                      Your first supporter will appear here.
+                  <div className="rounded-[10px] border border-[#DED8CE] bg-[#FFFFFF] p-8 text-center shadow-xs">
+                    <p className="text-xs font-semibold text-[#1E1D1A]">No verified support yet.</p>
+                    <p className="mt-1 text-xs text-[#6F6A60]">
+                      Be the first supporter to back @{username}&apos;s work.
                     </p>
                   </div>
                 ) : (
@@ -771,33 +792,25 @@ const PaymentPage = ({ username, initialUser = null, initialPayments = [] }) => 
                     {payments.map((payment, index) => (
                       <div
                         key={payment._id || index}
-                        className="rounded-[10px] border border-[#34322C] bg-[#201F1B] p-3.5 text-xs"
+                        className="rounded-[10px] border border-[#DED8CE] bg-[#FFFFFF] p-3.5 shadow-xs text-xs"
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            <span className="font-medium text-[#F4F0E8]">
+                            <span className="font-semibold text-[#1E1D1A]">
                               {payment.name}
                             </span>
-                            <span className="text-[11px] text-[#77736B]">
-                              {payment.createdAt
-                                ? new Date(payment.createdAt).toLocaleDateString(
-                                    "en-IN",
-                                    {
-                                      month: "short",
-                                      day: "numeric",
-                                    }
-                                  )
-                                : "Supporter"}
+                            <span className="text-[11px] text-[#918B80]">
+                              · {getRelativeTime(payment.createdAt)}
                             </span>
                           </div>
 
-                          <span className="font-medium text-[#C96F43]">
+                          <span className="font-bold text-[#C86B3C]">
                             ₹{payment.amount}
                           </span>
                         </div>
 
                         {payment.message && (
-                          <p className="mt-2 text-[#AAA59A] italic">
+                          <p className="mt-2 text-[#6F6A60] italic bg-[#F7F4EE] p-2 rounded-[5px]">
                             &ldquo;{payment.message}&rdquo;
                           </p>
                         )}
@@ -810,34 +823,34 @@ const PaymentPage = ({ username, initialUser = null, initialPayments = [] }) => 
 
             {/* Right Column: Support Action Box (5 cols) */}
             <div className="lg:col-span-5">
-              <div className="sticky top-20 rounded-[10px] border border-[#34322C] bg-[#201F1B] p-6">
-                <h2 className="font-heading text-base font-semibold text-[#F4F0E8]">
+              <div className="sticky top-20 rounded-[12px] border border-[#DED8CE] bg-[#FFFFFF] p-6 shadow-md">
+                <h2 className="font-heading text-base font-bold text-[#1E1D1A]">
                   Support {displayName}
                 </h2>
-                <p className="mt-1 text-xs text-[#77736B]">
+                <p className="mt-1 text-xs text-[#6F6A60]">
                   {isLinkMethod
-                    ? "Proceed to the creator's direct Razorpay payment link."
-                    : "Direct contribution via integrated Razorpay."}
+                    ? "Direct contribution via creator's personalized Razorpay link."
+                    : "Direct contribution via integrated Razorpay checkout."}
                 </p>
 
                 {/* Purpose banner if set */}
                 {currentUser.supportPurpose && (
-                  <div className="mt-4 rounded-[7px] border border-[#34322C] bg-[#171613] p-3 text-xs text-[#AAA59A]">
-                    <span className="text-[#C96F43] font-medium block mb-0.5">What this funds:</span>
+                  <div className="mt-4 rounded-[7px] border border-[#DED8CE] bg-[#F7F4EE] p-3 text-xs text-[#6F6A60]">
+                    <span className="text-[#C86B3C] font-semibold block mb-0.5">What this funds:</span>
                     {currentUser.supportPurpose}
                   </div>
                 )}
 
-                {/* Form */}
+                {/* Support Form */}
                 <form onSubmit={handlePay} className="mt-5 space-y-4">
                   {/* Name field (for gateway flow) */}
                   {!isLinkMethod && !paymentform.isAnonymous && (
                     <div>
                       <label
                         htmlFor="name"
-                        className="block text-xs font-medium text-[#AAA59A] mb-1"
+                        className="block text-xs font-medium text-[#6F6A60] mb-1"
                       >
-                        Your name
+                        Your name or handle
                       </label>
                       <input
                         id="name"
@@ -847,7 +860,7 @@ const PaymentPage = ({ username, initialUser = null, initialPayments = [] }) => 
                         type="text"
                         required={!paymentform.isAnonymous}
                         placeholder="e.g. Alex Rivera"
-                        className="w-full rounded-[7px] border border-[#34322C] bg-[#171613] px-3 py-2 text-xs text-[#F4F0E8] outline-none transition focus:border-[#C96F43] focus:ring-1 focus:ring-[#C96F43]/40"
+                        className="w-full rounded-[7px] border border-[#DED8CE] bg-[#F7F4EE] px-3 py-2 text-xs text-[#1E1D1A] outline-none transition focus:border-[#C86B3C] focus:bg-[#FFFFFF] focus:ring-2 focus:ring-[#C86B3C]/20"
                       />
                     </div>
                   )}
@@ -855,15 +868,15 @@ const PaymentPage = ({ username, initialUser = null, initialPayments = [] }) => 
                   {/* Anonymous toggle (for gateway flow) */}
                   {!isLinkMethod && (
                     <div>
-                      <label className="flex items-center gap-2 text-xs text-[#AAA59A] cursor-pointer">
+                      <label className="flex items-center gap-2 text-xs text-[#6F6A60] cursor-pointer">
                         <input
                           type="checkbox"
                           name="isAnonymous"
                           checked={paymentform.isAnonymous}
                           onChange={handleChange}
-                          className="rounded border-[#34322C] text-[#C96F43] focus:ring-0"
+                          className="rounded border-[#DED8CE] text-[#C86B3C] focus:ring-0"
                         />
-                        <span>Make contribution anonymous</span>
+                        <span>Make my contribution anonymous</span>
                       </label>
                     </div>
                   )}
@@ -874,11 +887,11 @@ const PaymentPage = ({ username, initialUser = null, initialPayments = [] }) => 
                       <div className="flex items-center justify-between mb-1">
                         <label
                           htmlFor="message"
-                          className="block text-xs font-medium text-[#AAA59A]"
+                          className="block text-xs font-medium text-[#6F6A60]"
                         >
-                          Message (optional)
+                          Note of encouragement (optional)
                         </label>
-                        <span className="text-[10px] text-[#77736B]">
+                        <span className="text-[10px] text-[#918B80]">
                           {paymentform.message.length}/300
                         </span>
                       </div>
@@ -889,8 +902,8 @@ const PaymentPage = ({ username, initialUser = null, initialPayments = [] }) => 
                         name="message"
                         maxLength={300}
                         rows={2}
-                        placeholder="Keep building great things..."
-                        className="w-full resize-none rounded-[7px] border border-[#34322C] bg-[#171613] px-3 py-2 text-xs text-[#F4F0E8] outline-none transition focus:border-[#C96F43] focus:ring-1 focus:ring-[#C96F43]/40"
+                        placeholder="Keep building amazing things!..."
+                        className="w-full resize-none rounded-[7px] border border-[#DED8CE] bg-[#F7F4EE] px-3 py-2 text-xs text-[#1E1D1A] outline-none transition focus:border-[#C86B3C] focus:bg-[#FFFFFF] focus:ring-2 focus:ring-[#C86B3C]/20"
                       />
                     </div>
                   )}
@@ -900,12 +913,12 @@ const PaymentPage = ({ username, initialUser = null, initialPayments = [] }) => 
                     <div>
                       <label
                         htmlFor="amount"
-                        className="block text-xs font-medium text-[#AAA59A] mb-1"
+                        className="block text-xs font-medium text-[#6F6A60] mb-1"
                       >
-                        Amount (₹)
+                        Contribution Amount (₹)
                       </label>
                       <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-[#77736B]">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-[#918B80]">
                           ₹
                         </span>
                         <input
@@ -916,8 +929,8 @@ const PaymentPage = ({ username, initialUser = null, initialPayments = [] }) => 
                           type="number"
                           min="1"
                           required
-                          placeholder="100"
-                          className="w-full rounded-[7px] border border-[#34322C] bg-[#171613] py-2 pl-7 pr-3 text-xs text-[#F4F0E8] outline-none transition focus:border-[#C96F43] focus:ring-1 focus:ring-[#C96F43]/40"
+                          placeholder="50"
+                          className="w-full rounded-[7px] border border-[#DED8CE] bg-[#F7F4EE] py-2 pl-7 pr-3 text-xs text-[#1E1D1A] font-semibold outline-none transition focus:border-[#C86B3C] focus:bg-[#FFFFFF] focus:ring-2 focus:ring-[#C86B3C]/20"
                         />
                       </div>
                     </div>
@@ -925,8 +938,8 @@ const PaymentPage = ({ username, initialUser = null, initialPayments = [] }) => 
 
                   {/* Presets (for gateway flow) */}
                   {!isLinkMethod && (
-                    <div className="grid grid-cols-4 gap-1.5">
-                      {[50, 100, 250, 500].map((preset) => (
+                    <div className="grid grid-cols-5 gap-1.5">
+                      {[2, 5, 10, 25, 50].map((preset) => (
                         <button
                           key={preset}
                           type="button"
@@ -936,10 +949,10 @@ const PaymentPage = ({ username, initialUser = null, initialPayments = [] }) => 
                               amount: String(preset),
                             }))
                           }
-                          className={`rounded-[6px] border py-1.5 text-xs font-medium transition-colors cursor-pointer ${
+                          className={`rounded-[6px] border py-1.5 text-xs font-semibold transition-colors cursor-pointer shadow-xs ${
                             paymentform.amount === String(preset)
-                              ? "border-[#C96F43] bg-[#C96F43]/15 text-[#E9DFD0]"
-                              : "border-[#34322C] bg-[#171613] text-[#AAA59A] hover:text-[#F4F0E8]"
+                              ? "border-[#C86B3C] bg-[#F5E8E0] text-[#C86B3C]"
+                              : "border-[#DED8CE] bg-[#F7F4EE] text-[#6F6A60] hover:text-[#1E1D1A] hover:bg-[#FFFFFF]"
                           }`}
                         >
                           ₹{preset}
@@ -948,15 +961,16 @@ const PaymentPage = ({ username, initialUser = null, initialPayments = [] }) => 
                     </div>
                   )}
 
-                  {/* Action CTA Button */}
+                  {/* Submit CTA */}
                   {isLinkMethod ? (
                     <div className="pt-2">
                       <button
                         type="submit"
                         disabled={!currentUser.razorpayLink}
-                        className="flex w-full items-center justify-center gap-2 rounded-[7px] bg-[#C96F43] hover:bg-[#D98255] active:bg-[#C96F43] px-4 py-2.5 text-xs font-medium text-white transition-colors disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
+                        className="flex w-full items-center justify-center gap-2 rounded-[7px] bg-[#C86B3C] hover:bg-[#A9552F] active:bg-[#C86B3C] px-4 py-2.5 text-xs font-medium text-white shadow-xs hover:shadow-sm transition disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
                       >
-                        Support {displayName} ↗
+                        <span>☕</span>
+                        <span>Support {displayName} via Razorpay Link ↗</span>
                       </button>
                     </div>
                   ) : (
@@ -970,31 +984,34 @@ const PaymentPage = ({ username, initialUser = null, initialPayments = [] }) => 
                           !paymentform.amount ||
                           Number(paymentform.amount) < 1
                         }
-                        className="flex w-full items-center justify-center gap-2 rounded-[7px] bg-[#C96F43] hover:bg-[#D98255] active:bg-[#C96F43] px-4 py-2.5 text-xs font-medium text-white transition-colors disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
+                        className="flex w-full items-center justify-center gap-2 rounded-[7px] bg-[#C86B3C] hover:bg-[#A9552F] active:bg-[#C86B3C] px-4 py-2.5 text-xs font-medium text-white shadow-xs hover:shadow-sm transition disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
                       >
                         {paying ? (
                           <>
                             <span className="h-3.5 w-3.5 animate-spin rounded-full border border-white/30 border-t-white" />
-                            <span>Opening Razorpay...</span>
+                            <span>Opening Razorpay Checkout...</span>
                           </>
                         ) : (
                           <>
-                            Support {displayName}
-                            {paymentform.amount &&
-                              Number(paymentform.amount) > 0 &&
-                              ` · ₹${Number(paymentform.amount).toLocaleString("en-IN")}`}
+                            <span>☕</span>
+                            <span>
+                              Support {displayName}
+                              {paymentform.amount &&
+                                Number(paymentform.amount) > 0 &&
+                                ` · ₹${Number(paymentform.amount).toLocaleString("en-IN")}`}
+                            </span>
                           </>
                         )}
                       </button>
                     </div>
                   )}
 
-                  <div className="pt-2 flex items-center justify-between text-[11px] text-[#77736B]">
-                    <span>Direct payments via Razorpay</span>
+                  <div className="pt-2 flex items-center justify-between text-[11px] text-[#918B80]">
+                    <span>🔒 Secured by Razorpay</span>
                     <button
                       type="button"
                       onClick={() => setShowReportModal(true)}
-                      className="hover:text-[#C85C52] transition-colors cursor-pointer"
+                      className="hover:text-[#B8544B] transition cursor-pointer"
                     >
                       Report profile
                     </button>
@@ -1007,37 +1024,37 @@ const PaymentPage = ({ username, initialUser = null, initialPayments = [] }) => 
 
         {/* SHARE MODAL */}
         {showShareModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-xs p-4">
-            <div className="w-full max-w-sm rounded-[12px] border border-[#34322C] bg-[#201F1B] p-5 shadow-2xl">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
+            <div className="w-full max-w-sm rounded-[12px] border border-[#DED8CE] bg-[#FFFFFF] p-5 shadow-2xl">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-heading text-sm font-semibold text-[#F4F0E8]">
-                  Share profile
+                <h3 className="font-heading text-sm font-bold text-[#1E1D1A]">
+                  Share creator profile
                 </h3>
                 <button
                   type="button"
                   onClick={() => setShowShareModal(false)}
-                  className="text-[#77736B] hover:text-[#F4F0E8] text-xs p-1"
+                  className="text-[#918B80] hover:text-[#1E1D1A] text-xs p-1"
                 >
                   ✕
                 </button>
               </div>
 
-              <p className="text-xs text-[#AAA59A] mb-4">
-                Share @{username}&apos;s profile link with your network.
+              <p className="text-xs text-[#6F6A60] mb-4">
+                Share @{username}&apos;s profile to help them reach more backers.
               </p>
 
               {/* Copy Link Input */}
-              <div className="flex items-center gap-2 rounded-[7px] border border-[#34322C] bg-[#171613] p-1.5 mb-4">
+              <div className="flex items-center gap-2 rounded-[7px] border border-[#DED8CE] bg-[#F7F4EE] p-1.5 mb-4">
                 <input
                   type="text"
                   readOnly
                   value={currentUrl}
-                  className="flex-1 bg-transparent px-2 text-xs text-[#AAA59A] outline-none truncate"
+                  className="flex-1 bg-transparent px-2 text-xs text-[#6F6A60] outline-none truncate"
                 />
                 <button
                   type="button"
                   onClick={handleCopyLink}
-                  className="rounded-[6px] bg-[#C96F43] hover:bg-[#D98255] px-3 py-1 text-xs font-medium text-white transition-colors cursor-pointer"
+                  className="rounded-[6px] bg-[#C86B3C] hover:bg-[#A9552F] px-3 py-1 text-xs font-medium text-white transition shadow-xs cursor-pointer"
                 >
                   Copy
                 </button>
@@ -1046,10 +1063,10 @@ const PaymentPage = ({ username, initialUser = null, initialPayments = [] }) => 
               {/* Social Share Buttons */}
               <div className="grid grid-cols-3 gap-2">
                 <a
-                  href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`Check out @${username} on The Brew Club: ${currentUrl}`)}`}
+                  href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`Support @${username} on The Brew Club: ${currentUrl}`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center rounded-[6px] border border-[#34322C] bg-[#171613] py-2 text-xs font-medium text-[#AAA59A] hover:text-[#F4F0E8] transition-colors"
+                  className="flex items-center justify-center rounded-[6px] border border-[#DED8CE] bg-[#F7F4EE] py-2 text-xs font-medium text-[#1E1D1A] hover:bg-[#F0ECE4] transition"
                 >
                   WhatsApp
                 </a>
@@ -1058,7 +1075,7 @@ const PaymentPage = ({ username, initialUser = null, initialPayments = [] }) => 
                   href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Support @${username} on The Brew Club!`)}&url=${encodeURIComponent(currentUrl)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center rounded-[6px] border border-[#34322C] bg-[#171613] py-2 text-xs font-medium text-[#AAA59A] hover:text-[#F4F0E8] transition-colors"
+                  className="flex items-center justify-center rounded-[6px] border border-[#DED8CE] bg-[#F7F4EE] py-2 text-xs font-medium text-[#1E1D1A] hover:bg-[#F0ECE4] transition"
                 >
                   X
                 </a>
@@ -1067,7 +1084,7 @@ const PaymentPage = ({ username, initialUser = null, initialPayments = [] }) => 
                   href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(currentUrl)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center rounded-[6px] border border-[#34322C] bg-[#171613] py-2 text-xs font-medium text-[#AAA59A] hover:text-[#F4F0E8] transition-colors"
+                  className="flex items-center justify-center rounded-[6px] border border-[#DED8CE] bg-[#F7F4EE] py-2 text-xs font-medium text-[#1E1D1A] hover:bg-[#F0ECE4] transition"
                 >
                   LinkedIn
                 </a>
@@ -1078,16 +1095,16 @@ const PaymentPage = ({ username, initialUser = null, initialPayments = [] }) => 
 
         {/* REPORT MODAL */}
         {showReportModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-xs p-4">
-            <div className="w-full max-w-sm rounded-[12px] border border-[#34322C] bg-[#201F1B] p-5 shadow-2xl">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
+            <div className="w-full max-w-sm rounded-[12px] border border-[#DED8CE] bg-[#FFFFFF] p-5 shadow-2xl">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-heading text-sm font-semibold text-[#F4F0E8]">
+                <h3 className="font-heading text-sm font-bold text-[#1E1D1A]">
                   Report profile
                 </h3>
                 <button
                   type="button"
                   onClick={() => setShowReportModal(false)}
-                  className="text-[#77736B] hover:text-[#F4F0E8] text-xs p-1"
+                  className="text-[#918B80] hover:text-[#1E1D1A] text-xs p-1"
                 >
                   ✕
                 </button>
@@ -1095,13 +1112,13 @@ const PaymentPage = ({ username, initialUser = null, initialPayments = [] }) => 
 
               <form onSubmit={handleReportSubmit} className="space-y-3">
                 <div>
-                  <label className="block text-xs font-medium text-[#AAA59A] mb-1">
+                  <label className="block text-xs font-medium text-[#6F6A60] mb-1">
                     Reason
                   </label>
                   <select
                     value={reportReason}
                     onChange={(e) => setReportReason(e.target.value)}
-                    className="w-full rounded-[7px] border border-[#34322C] bg-[#171613] px-3 py-2 text-xs text-[#F4F0E8] outline-none focus:border-[#C96F43]"
+                    className="w-full rounded-[7px] border border-[#DED8CE] bg-[#F7F4EE] px-3 py-2 text-xs text-[#1E1D1A] outline-none focus:border-[#C86B3C]"
                   >
                     <option value="Spam">Spam / Advertisements</option>
                     <option value="Misleading Content">Misleading Information / Impersonation</option>
@@ -1112,15 +1129,15 @@ const PaymentPage = ({ username, initialUser = null, initialPayments = [] }) => 
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-[#AAA59A] mb-1">
+                  <label className="block text-xs font-medium text-[#6F6A60] mb-1">
                     Details
                   </label>
                   <textarea
                     rows={3}
                     value={reportDescription}
                     onChange={(e) => setReportDescription(e.target.value)}
-                    placeholder="Briefly explain the issue for our moderation review..."
-                    className="w-full resize-none rounded-[7px] border border-[#34322C] bg-[#171613] px-3 py-2 text-xs text-[#F4F0E8] outline-none focus:border-[#C96F43]"
+                    placeholder="Briefly explain the issue for review..."
+                    className="w-full resize-none rounded-[7px] border border-[#DED8CE] bg-[#F7F4EE] px-3 py-2 text-xs text-[#1E1D1A] outline-none focus:border-[#C86B3C]"
                   />
                 </div>
 
@@ -1128,14 +1145,14 @@ const PaymentPage = ({ username, initialUser = null, initialPayments = [] }) => 
                   <button
                     type="button"
                     onClick={() => setShowReportModal(false)}
-                    className="rounded-[6px] border border-[#34322C] bg-[#171613] px-3 py-1.5 text-xs text-[#AAA59A] hover:text-[#F4F0E8]"
+                    className="rounded-[6px] border border-[#DED8CE] bg-[#F7F4EE] px-3 py-1.5 text-xs font-medium text-[#6F6A60] hover:text-[#1E1D1A]"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={submittingReport}
-                    className="rounded-[6px] bg-[#C85C52] hover:bg-[#C85C52]/90 px-3 py-1.5 text-xs font-medium text-white transition-colors disabled:opacity-50"
+                    className="rounded-[6px] bg-[#B8544B] hover:bg-[#B8544B]/90 px-3 py-1.5 text-xs font-medium text-white transition disabled:opacity-50"
                   >
                     {submittingReport ? "Submitting..." : "Submit report"}
                   </button>

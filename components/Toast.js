@@ -39,31 +39,31 @@ export const ToastProvider = ({ children }) => {
         {toasts.map((t) => (
           <div
             key={t.id}
-            className={`pointer-events-auto flex items-start gap-2.5 rounded-[8px] border px-3.5 py-2.5 shadow-lg backdrop-blur-md transition-all duration-200 ${
+            className={`pointer-events-auto flex items-start gap-3 rounded-[10px] border px-4 py-3 shadow-md transition-all duration-200 ${
               t.type === "success"
-                ? "border-[#7E9B72]/40 bg-[#201F1B] text-[#F4F0E8]"
+                ? "border-[#557A5C]/40 bg-[#FFFFFF] text-[#1E1D1A]"
                 : t.type === "error"
-                ? "border-[#C85C52]/40 bg-[#201F1B] text-[#F4F0E8]"
-                : "border-[#34322C] bg-[#201F1B] text-[#F4F0E8]"
+                ? "border-[#B8544B]/40 bg-[#FFFFFF] text-[#1E1D1A]"
+                : "border-[#DED8CE] bg-[#FFFFFF] text-[#1E1D1A]"
             }`}
           >
             <span
-              className={`text-xs font-bold ${
+              className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
                 t.type === "success"
-                  ? "text-[#7E9B72]"
+                  ? "bg-[#557A5C]/10 text-[#557A5C]"
                   : t.type === "error"
-                  ? "text-[#C85C52]"
-                  : "text-[#C96F43]"
+                  ? "bg-[#B8544B]/10 text-[#B8544B]"
+                  : "bg-[#F5E8E0] text-[#C86B3C]"
               }`}
             >
               {t.type === "success" ? "✓" : t.type === "error" ? "✕" : "☕"}
             </span>
-            <div className="flex-1 text-xs leading-relaxed text-[#F4F0E8]">
+            <div className="flex-1 text-xs font-medium leading-relaxed text-[#1E1D1A]">
               {t.message}
             </div>
             <button
               onClick={() => removeToast(t.id)}
-              className="text-[#77736B] hover:text-[#AAA59A] text-xs transition-colors ml-1 cursor-pointer"
+              className="text-[#6F6A60] hover:text-[#1E1D1A] text-xs transition-colors ml-1 cursor-pointer"
               aria-label="Dismiss notification"
             >
               ✕
