@@ -1,10 +1,9 @@
 import React from "react";
 import PaymentPage from "@/components/PaymentPage";
 import { notFound } from "next/navigation";
-import connectDb from "@/db/connectDb";
-import User from "@/models/User";
+import { fetchuser, fetchpayments } from "@/actions/useractions";
 
-const Username = async ({ params }) => {
+const UsernamePage = async ({ params }) => {
   const resolvedParams = await params;
   const username = resolvedParams?.username;
 
@@ -12,24 +11,36 @@ const Username = async ({ params }) => {
     return notFound();
   }
 
-  await connectDb();
-  const user = await User.findOne({ username }).lean();
-
+  const user = await fetchuser(username);
   if (!user) {
     return notFound();
   }
 
-  return <PaymentPage username={username} />;
+  const payments = await fetchpayments(username);
+
+  return (
+    <PaymentPage
+      username={username}
+      initialUser={user}
+      initialPayments={payments || []}
+    />
+  );
 };
 
-export default Username;
+export default UsernamePage;
 
 export async function generateMetadata({ params }) {
   const resolvedParams = await params;
   const username = resolvedParams?.username || "Creator";
 
+  const user = await fetchuser(username);
+  const displayName = user?.name || username;
+  const bio =
+    user?.bio ||
+    `Support @${username} on The Brew Club. Fuel their creative journey.`;
+
   return {
-    title: `Support @${username} - The Brew Club`,
-    description: `Support @${username} on The Brew Club. Fuel their creative journey.`,
+    title: `${displayName} (@${username}) - The Brew Club`,
+    description: bio,
   };
 }

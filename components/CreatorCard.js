@@ -11,6 +11,7 @@ const CreatorCard = ({ creator }) => {
 
   const displayName = creator.name || creator.username;
   const initial = (displayName.charAt(0) || "C").toUpperCase();
+  const skills = Array.isArray(creator.skills) ? creator.skills.slice(0, 3) : [];
 
   return (
     <Link
@@ -69,14 +70,38 @@ const CreatorCard = ({ creator }) => {
         </div>
 
         {/* Creator Bio / Description */}
-        <p className="mt-3 text-xs leading-relaxed text-gray-400 line-clamp-3 flex-1">
+        <p className="mt-3 text-xs leading-relaxed text-gray-400 line-clamp-2">
           {creator.bio && creator.bio.trim()
             ? creator.bio
             : "Independent creator building and sharing creative work on The Brew Club."}
         </p>
 
+        {/* Currently Building indicator if available */}
+        {creator.currentWork && creator.currentWork.trim() && (
+          <p className="mt-2 text-[11px] text-amber-300/90 truncate flex items-center gap-1">
+            <span>🔨</span>
+            <span className="truncate">{creator.currentWork}</span>
+          </p>
+        )}
+
+        {/* Skill tags if available */}
+        {skills.length > 0 && (
+          <div className="mt-3 flex flex-wrap gap-1.5">
+            {skills.map((skill, idx) => (
+              <span
+                key={idx}
+                className="rounded-md border border-white/5 bg-white/4 px-2 py-0.5 text-[10px] font-medium text-gray-300"
+              >
+                #{skill}
+              </span>
+            ))}
+          </div>
+        )}
+
+        <div className="flex-1" />
+
         {/* Card Action */}
-        <div className="mt-6 flex items-center justify-between border-t border-white/5 pt-4 text-xs font-semibold text-gray-300 transition-colors group-hover:text-amber-400">
+        <div className="mt-5 flex items-center justify-between border-t border-white/5 pt-4 text-xs font-semibold text-gray-300 transition-colors group-hover:text-amber-400">
           <span>View Profile</span>
           <span className="transition-transform duration-200 group-hover:translate-x-1">
             →

@@ -7,16 +7,16 @@ import { fetchuser, fetchpayments, initiate } from "@/actions/useractions";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useToast } from "./Toast";
 
-const PaymentPage = ({ username }) => {
+const PaymentPage = ({ username, initialUser = null, initialPayments = [] }) => {
   const [paymentform, setPaymentform] = useState({
     name: "",
     message: "",
     amount: "100",
   });
 
-  const [currentUser, setCurrentUser] = useState(null);
-  const [payments, setPayments] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [currentUser, setCurrentUser] = useState(initialUser);
+  const [payments, setPayments] = useState(initialPayments);
+  const [loading, setLoading] = useState(!initialUser);
   const [paying, setPaying] = useState(false);
   const [scriptLoaded, setScriptLoaded] = useState(false);
 
@@ -186,7 +186,7 @@ const PaymentPage = ({ username }) => {
         <div className="flex min-h-[70vh] items-center justify-center">
           <div className="flex flex-col items-center gap-4">
             <div className="h-9 w-9 animate-spin rounded-full border-2 border-white/10 border-t-amber-400" />
-            <p className="text-sm text-gray-500">Loading creator page...</p>
+            <p className="text-sm text-gray-500">Loading creator portfolio...</p>
           </div>
         </div>
       </main>
@@ -221,6 +221,26 @@ const PaymentPage = ({ username }) => {
     );
   }
 
+  // Filter valid projects
+  const validProjects = Array.isArray(currentUser.projects)
+    ? currentUser.projects.filter((p) => p && p.name && p.name.trim())
+    : [];
+
+  // Filter valid achievements
+  const validAchievements = Array.isArray(currentUser.achievements)
+    ? currentUser.achievements.filter((a) => typeof a === "string" && a.trim())
+    : [];
+
+  // Filter valid skills
+  const validSkills = Array.isArray(currentUser.skills)
+    ? currentUser.skills.filter((s) => typeof s === "string" && s.trim())
+    : [];
+
+  // Social Links
+  const social = currentUser.socialLinks || {};
+  const hasSocialLinks =
+    social.github || social.linkedin || social.portfolio || social.twitter || social.other;
+
   return (
     <>
       <Script
@@ -229,10 +249,13 @@ const PaymentPage = ({ username }) => {
         onLoad={() => setScriptLoaded(true)}
       />
 
-      <main className="min-h-screen bg-[#0b0b0f] text-white pb-20">
-        {/* Creator Cover Banner */}
+      <main className="min-h-screen bg-[#0b0b0f] text-white pb-24">
+        {/* ================================================== */}
+        {/* 1. CREATOR COVER & HERO SECTION */}
+        {/* ================================================== */}
         <section className="relative">
-          <div className="h-56 w-full overflow-hidden bg-linear-to-b from-[#1c1710] via-[#141217] to-[#0b0b0f] md:h-80">
+          {/* Cover Banner */}
+          <div className="h-56 w-full overflow-hidden bg-linear-to-b from-[#1f1912] via-[#141217] to-[#0b0b0f] md:h-80 relative">
             {currentUser.coverpic ? (
               <>
                 <img
@@ -247,11 +270,11 @@ const PaymentPage = ({ username }) => {
                 />
                 <div
                   style={{ display: "none" }}
-                  className="cover-fallback h-full w-full bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-amber-500/10 via-transparent to-transparent"
+                  className="cover-fallback h-full w-full bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-amber-500/15 via-transparent to-transparent"
                 />
               </>
             ) : (
-              <div className="h-full w-full bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-amber-500/10 via-transparent to-transparent" />
+              <div className="h-full w-full bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-amber-500/15 via-transparent to-transparent" />
             )}
             <div className="absolute inset-0 bg-linear-to-t from-[#0b0b0f] via-transparent to-black/20" />
           </div>
@@ -273,13 +296,13 @@ const PaymentPage = ({ username }) => {
                   />
                   <div
                     style={{ display: "none" }}
-                    className="creator-avatar-fallback h-28 w-28 items-center justify-center rounded-full bg-linear-to-br from-amber-400 to-orange-500 text-4xl font-bold text-black md:h-32 md:w-32"
+                    className="creator-avatar-fallback h-28 w-28 items-center justify-center rounded-full bg-linear-to-br from-amber-400 to-orange-500 text-4xl font-extrabold text-black md:h-32 md:w-32"
                   >
                     {(currentUser.name || username)?.charAt(0).toUpperCase()}
                   </div>
                 </>
               ) : (
-                <div className="flex h-28 w-28 items-center justify-center rounded-full bg-linear-to-br from-amber-400 to-orange-500 text-4xl font-bold text-black md:h-32 md:w-32">
+                <div className="flex h-28 w-28 items-center justify-center rounded-full bg-linear-to-br from-amber-400 to-orange-500 text-4xl font-extrabold text-black md:h-32 md:w-32">
                   {(currentUser.name || username)?.charAt(0).toUpperCase()}
                 </div>
               )}
@@ -287,32 +310,109 @@ const PaymentPage = ({ username }) => {
           </div>
         </section>
 
-        {/* Creator Header Info */}
-        <section className="px-5 pb-10 pt-24 text-center">
-          <div className="mx-auto max-w-2xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-400">
-              Creator Profile
-            </p>
+        {/* Creator Info & Header */}
+        <section className="px-5 pb-8 pt-24 text-center">
+          <div className="mx-auto max-w-3xl">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 mb-3 rounded-full border border-amber-400/20 bg-amber-400/10 text-xs font-semibold text-amber-300">
+              <span>☕</span>
+              <span>Creator Profile</span>
+            </div>
 
-            <h1 className="mt-2 text-3xl font-bold tracking-tight md:text-4xl text-white">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white">
               {currentUser.name || username}
             </h1>
 
-            <p className="mt-1 text-sm text-amber-400/90 font-medium">@{username}</p>
+            <p className="mt-1 text-sm font-semibold text-amber-400">
+              @{username}
+            </p>
 
+            {/* Short Bio */}
             {currentUser.bio && currentUser.bio.trim() ? (
-              <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-gray-300 md:text-base whitespace-pre-line">
+              <p className="mx-auto mt-4 max-w-2xl text-sm sm:text-base leading-relaxed text-gray-300">
                 {currentUser.bio}
               </p>
             ) : (
-              <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-gray-300 md:text-base">
-                Support the work, projects, and creative journey. Every contribution
-                helps fuel independent creators.
+              <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-gray-400">
+                Independent creator sharing projects and creative work on The Brew Club.
               </p>
             )}
 
-            {/* Stats Bar */}
-            <div className="mt-8 inline-flex items-center gap-8 rounded-2xl border border-white/10 bg-white/3 px-8 py-4">
+            {/* Skills Badges */}
+            {validSkills.length > 0 && (
+              <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+                {validSkills.map((skill, index) => (
+                  <span
+                    key={index}
+                    className="rounded-lg border border-white/10 bg-white/4 px-3 py-1 text-xs font-medium text-amber-300"
+                  >
+                    #{skill}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {/* Social Links */}
+            {hasSocialLinks && (
+              <div className="mt-5 flex flex-wrap items-center justify-center gap-2.5">
+                {social.github && (
+                  <a
+                    href={social.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/4 px-3.5 py-2 text-xs font-semibold text-gray-300 hover:bg-white/10 hover:text-white transition"
+                  >
+                    <span>🐙</span> GitHub
+                  </a>
+                )}
+
+                {social.linkedin && (
+                  <a
+                    href={social.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/4 px-3.5 py-2 text-xs font-semibold text-gray-300 hover:bg-white/10 hover:text-white transition"
+                  >
+                    <span>💼</span> LinkedIn
+                  </a>
+                )}
+
+                {social.portfolio && (
+                  <a
+                    href={social.portfolio}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/4 px-3.5 py-2 text-xs font-semibold text-gray-300 hover:bg-white/10 hover:text-white transition"
+                  >
+                    <span>✨</span> Portfolio
+                  </a>
+                )}
+
+                {social.twitter && (
+                  <a
+                    href={social.twitter}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/4 px-3.5 py-2 text-xs font-semibold text-gray-300 hover:bg-white/10 hover:text-white transition"
+                  >
+                    <span>🐦</span> X (Twitter)
+                  </a>
+                )}
+
+                {social.other && (
+                  <a
+                    href={social.other}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/4 px-3.5 py-2 text-xs font-semibold text-gray-300 hover:bg-white/10 hover:text-white transition"
+                  >
+                    <span>🔗</span> Website
+                  </a>
+                )}
+              </div>
+            )}
+
+            {/* Quick Stats */}
+            <div className="mt-8 inline-flex items-center gap-8 rounded-2xl border border-white/10 bg-white/3 px-8 py-4 shadow-lg">
               <div>
                 <p className="text-2xl font-bold text-white">
                   {payments.length}
@@ -336,229 +436,426 @@ const PaymentPage = ({ username }) => {
           </div>
         </section>
 
-        {/* Main Grid: Supporters & Contribution Card */}
-        <section className="mx-auto grid max-w-6xl gap-8 px-5 md:grid-cols-2 md:px-8">
-          {/* Supporters List */}
-          <div className="rounded-3xl border border-white/10 bg-white/3 overflow-hidden flex flex-col">
-            <div className="border-b border-white/10 px-6 py-6 md:px-8">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-amber-400">
-                Community Backing
+        {/* ================================================== */}
+        {/* 2. CREATOR HIGHLIGHTS: ABOUT / BUILDING / WHY SUPPORT */}
+        {/* ================================================== */}
+        <section className="mx-auto max-w-6xl px-5 py-6">
+          <div className="grid gap-6 md:grid-cols-2">
+            {/* About Section */}
+            {currentUser.about && currentUser.about.trim() && (
+              <div className="rounded-3xl border border-white/10 bg-white/3 p-6 sm:p-8 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-amber-400 mb-3">
+                    <span>📖</span> About @{username}
+                  </div>
+                  <h2 className="text-xl font-bold text-white mb-3">
+                    Meet the Creator
+                  </h2>
+                  <p className="text-sm leading-relaxed text-gray-300 whitespace-pre-line">
+                    {currentUser.about}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Currently Building Section */}
+            {currentUser.currentWork && currentUser.currentWork.trim() && (
+              <div className="rounded-3xl border border-white/10 bg-white/3 p-6 sm:p-8 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-amber-400 mb-3">
+                    <span>🔨</span> Active Development
+                  </div>
+                  <h2 className="text-xl font-bold text-white mb-3">
+                    What I&apos;m Currently Building
+                  </h2>
+                  <p className="text-sm leading-relaxed text-gray-300 whitespace-pre-line">
+                    {currentUser.currentWork}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Why Support Me Section */}
+            {currentUser.whySupport && currentUser.whySupport.trim() && (
+              <div className="rounded-3xl border border-amber-400/20 bg-linear-to-br from-amber-400/5 to-orange-500/5 p-6 sm:p-8 md:col-span-2">
+                <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-amber-400 mb-2">
+                  <span>☕</span> Impact of Your Support
+                </div>
+                <h2 className="text-xl font-bold text-white mb-3">
+                  Why Back My Journey?
+                </h2>
+                <p className="text-sm leading-relaxed text-gray-200 whitespace-pre-line max-w-4xl">
+                  {currentUser.whySupport}
+                </p>
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* ================================================== */}
+        {/* 3. FEATURED PROJECTS SHOWCASE */}
+        {/* ================================================== */}
+        {validProjects.length > 0 && (
+          <section className="mx-auto max-w-6xl px-5 py-8">
+            <div className="mb-6">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-400">
+                Portfolio
               </p>
-              <h2 className="mt-1 text-xl font-bold text-white">
-                Recent Supporters
+              <h2 className="text-2xl font-bold text-white mt-1">
+                Featured Projects & Creations
               </h2>
-              <p className="mt-1 text-xs text-gray-400">
-                People who believe in @{username}&apos;s vision.
+              <p className="text-xs text-gray-400 mt-1">
+                Work and tools built by @{username}.
               </p>
             </div>
 
-            <div className="flex-1 max-h-120 overflow-y-auto px-6 py-6 md:px-8">
-              {payments.length === 0 ? (
-                <div className="flex min-h-60 flex-col items-center justify-center text-center">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-400/10 text-xl">
-                    ☕
-                  </div>
-                  <p className="mt-4 text-sm font-semibold text-gray-200">
-                    Be the first supporter of @{username}
-                  </p>
-                  <p className="mt-1 max-w-xs text-xs text-gray-400">
-                    Your contribution directly helps them build their next great project.
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {payments.map((payment, index) => (
-                    <div
-                      key={payment._id || index}
-                      className="rounded-2xl border border-white/5 bg-white/2 p-4 transition hover:bg-white/4"
-                    >
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-3 min-w-0">
-                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-400/10 text-sm font-semibold text-amber-400">
-                            {(payment.name || "A").charAt(0).toUpperCase()}
-                          </div>
-                          <div className="min-w-0">
-                            <p className="truncate text-sm font-semibold text-white">
-                              {payment.name}
-                            </p>
-                            <p className="text-[11px] text-gray-500">
-                              {payment.createdAt
-                                ? new Date(payment.createdAt).toLocaleDateString(
-                                    "en-IN",
-                                    {
-                                      month: "short",
-                                      day: "numeric",
-                                      year: "numeric",
-                                    }
-                                  )
-                                : "Supporter"}
-                            </p>
-                          </div>
-                        </div>
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {validProjects.map((project, idx) => (
+                <div
+                  key={idx}
+                  className="group rounded-3xl border border-white/10 bg-white/3 overflow-hidden flex flex-col justify-between transition hover:border-amber-400/30 hover:bg-white/5 shadow-lg"
+                >
+                  {project.image && (
+                    <div className="h-44 w-full overflow-hidden bg-black/40">
+                      <img
+                        src={project.image}
+                        alt={project.name}
+                        onError={(e) => {
+                          e.currentTarget.style.display = "none";
+                        }}
+                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+                    </div>
+                  )}
 
-                        <span className="rounded-lg bg-amber-400/10 px-2.5 py-1 text-xs font-bold text-amber-400 shrink-0">
-                          ₹{payment.amount}
-                        </span>
-                      </div>
+                  <div className="p-6 flex-1 flex flex-col justify-between">
+                    <div>
+                      <h3 className="text-lg font-bold text-white group-hover:text-amber-300 transition">
+                        {project.name}
+                      </h3>
 
-                      {payment.message && (
-                        <p className="mt-3 rounded-xl bg-black/30 px-3 py-2 text-xs text-gray-300 leading-relaxed italic">
-                          &ldquo;{payment.message}&rdquo;
+                      {project.description && (
+                        <p className="mt-2 text-xs leading-relaxed text-gray-400 line-clamp-4">
+                          {project.description}
                         </p>
                       )}
                     </div>
-                  ))}
+
+                    {/* Project Action Links (no empty buttons) */}
+                    {(project.live || project.github || project.url) && (
+                      <div className="mt-6 pt-4 border-t border-white/5 flex flex-wrap items-center gap-2">
+                        {project.live && (
+                          <a
+                            href={project.live}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 rounded-xl bg-linear-to-r from-amber-400 to-orange-500 px-3 py-1.5 text-xs font-bold text-black transition hover:opacity-95"
+                          >
+                            <span>🚀</span> Live Demo
+                          </a>
+                        )}
+
+                        {project.github && (
+                          <a
+                            href={project.github}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-gray-300 hover:bg-white/10 hover:text-white transition"
+                          >
+                            <span>🐙</span> GitHub
+                          </a>
+                        )}
+
+                        {project.url && !project.live && (
+                          <a
+                            href={project.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-gray-300 hover:bg-white/10 hover:text-white transition"
+                          >
+                            <span>🔗</span> View Project
+                          </a>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
-              )}
+              ))}
             </div>
+          </section>
+        )}
+
+        {/* ================================================== */}
+        {/* 4. ACHIEVEMENTS & MILESTONES */}
+        {/* ================================================== */}
+        {validAchievements.length > 0 && (
+          <section className="mx-auto max-w-6xl px-5 py-6">
+            <div className="rounded-3xl border border-white/10 bg-white/3 p-6 sm:p-8">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-400 mb-1">
+                Milestones
+              </p>
+              <h2 className="text-xl sm:text-2xl font-bold text-white mb-6">
+                Achievements & Recognition
+              </h2>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                {validAchievements.map((item, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-start gap-3 rounded-2xl border border-white/5 bg-black/20 p-4 transition hover:border-amber-400/20"
+                  >
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-amber-400/10 text-amber-400 text-sm">
+                      🏆
+                    </div>
+                    <p className="text-xs sm:text-sm font-medium text-gray-200 leading-relaxed pt-1">
+                      {item}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* ================================================== */}
+        {/* 5. SUPPORT & PAYMENT SECTION */}
+        {/* ================================================== */}
+        <section className="mx-auto max-w-6xl px-5 pt-8">
+          <div className="mb-6">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-400">
+              Fuel The Work
+            </p>
+            <h2 className="text-2xl font-bold text-white mt-1">
+              Support @{username}
+            </h2>
+            <p className="text-xs text-gray-400 mt-1">
+              Send a cup of coffee and fuel their next release.
+            </p>
           </div>
 
-          {/* Support Form Card */}
-          <div className="rounded-3xl border border-white/10 bg-white/3 overflow-hidden">
-            <div className="border-b border-white/10 px-6 py-6 md:px-8">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-amber-400">
-                Support The Creator
-              </p>
-              <h2 className="mt-1 text-xl font-bold text-white">
-                Contribute to @{username}
-              </h2>
-              <p className="mt-1 text-xs text-gray-400">
-                Select an amount and leave an encouraging note.
-              </p>
+          <div className="grid gap-8 md:grid-cols-2">
+            {/* Supporters List */}
+            <div className="rounded-3xl border border-white/10 bg-white/3 overflow-hidden flex flex-col">
+              <div className="border-b border-white/10 px-6 py-6 md:px-8">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-amber-400">
+                  Community Backing
+                </p>
+                <h3 className="mt-1 text-xl font-bold text-white">
+                  Recent Supporters
+                </h3>
+                <p className="mt-1 text-xs text-gray-400">
+                  Supporters who have backed @{username}.
+                </p>
+              </div>
+
+              <div className="flex-1 max-h-120 overflow-y-auto px-6 py-6 md:px-8">
+                {payments.length === 0 ? (
+                  <div className="flex min-h-60 flex-col items-center justify-center text-center">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-400/10 text-xl">
+                      ☕
+                    </div>
+                    <p className="mt-4 text-sm font-semibold text-gray-200">
+                      Be the first supporter of @{username}
+                    </p>
+                    <p className="mt-1 max-w-xs text-xs text-gray-400">
+                      Your contribution directly empowers their ongoing creative work.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {payments.map((payment, index) => (
+                      <div
+                        key={payment._id || index}
+                        className="rounded-2xl border border-white/5 bg-white/2 p-4 transition hover:bg-white/4"
+                      >
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-400/10 text-sm font-semibold text-amber-400">
+                              {(payment.name || "A").charAt(0).toUpperCase()}
+                            </div>
+                            <div className="min-w-0">
+                              <p className="truncate text-sm font-semibold text-white">
+                                {payment.name}
+                              </p>
+                              <p className="text-[11px] text-gray-500">
+                                {payment.createdAt
+                                  ? new Date(payment.createdAt).toLocaleDateString(
+                                      "en-IN",
+                                      {
+                                        month: "short",
+                                        day: "numeric",
+                                        year: "numeric",
+                                      }
+                                    )
+                                  : "Supporter"}
+                              </p>
+                            </div>
+                          </div>
+
+                          <span className="rounded-lg bg-amber-400/10 px-2.5 py-1 text-xs font-bold text-amber-400 shrink-0">
+                            ₹{payment.amount}
+                          </span>
+                        </div>
+
+                        {payment.message && (
+                          <p className="mt-3 rounded-xl bg-black/30 px-3 py-2 text-xs text-gray-300 leading-relaxed italic">
+                            &ldquo;{payment.message}&rdquo;
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
-            <form onSubmit={handlePay} className="p-6 md:p-8">
-              {!currentUser.razorpayid && (
-                <div className="mb-6 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-xs text-amber-200">
-                  ⚠️ This creator has not linked their Razorpay gateway credentials yet.
-                  Payments will be available once configured in their dashboard.
-                </div>
-              )}
-
-              {/* Supporter Name */}
-              <div className="mb-4">
-                <label
-                  htmlFor="name"
-                  className="mb-2 block text-xs font-medium uppercase tracking-wider text-gray-300"
-                >
-                  Your Name or Handle
-                </label>
-                <input
-                  id="name"
-                  onChange={handleChange}
-                  value={paymentform.name}
-                  name="name"
-                  type="text"
-                  required
-                  placeholder="e.g. Alex"
-                  className="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400/60 focus:bg-black/50 focus:ring-2 focus:ring-amber-400/10"
-                />
+            {/* Support Form Card */}
+            <div className="rounded-3xl border border-white/10 bg-white/3 overflow-hidden">
+              <div className="border-b border-white/10 px-6 py-6 md:px-8">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-amber-400">
+                  Send A Contribution
+                </p>
+                <h3 className="mt-1 text-xl font-bold text-white">
+                  Contribute to @{username}
+                </h3>
+                <p className="mt-1 text-xs text-gray-400">
+                  Choose an amount and leave a message.
+                </p>
               </div>
 
-              {/* Supporter Message */}
-              <div className="mb-4">
-                <label
-                  htmlFor="message"
-                  className="mb-2 block text-xs font-medium uppercase tracking-wider text-gray-300"
-                >
-                  Note of Encouragement (Optional)
-                </label>
-                <textarea
-                  id="message"
-                  onChange={handleChange}
-                  value={paymentform.message}
-                  name="message"
-                  rows={3}
-                  placeholder="Keep building amazing things!..."
-                  className="w-full resize-none rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400/60 focus:bg-black/50 focus:ring-2 focus:ring-amber-400/10"
-                />
-              </div>
+              <form onSubmit={handlePay} className="p-6 md:p-8">
+                {!currentUser.razorpayid && (
+                  <div className="mb-6 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-xs text-amber-200">
+                    ⚠️ This creator has not linked their Razorpay gateway credentials yet.
+                    Payments will be available once configured in their dashboard.
+                  </div>
+                )}
 
-              {/* Amount Selection */}
-              <div className="mb-4">
-                <label
-                  htmlFor="amount"
-                  className="mb-2 block text-xs font-medium uppercase tracking-wider text-gray-300"
-                >
-                  Contribution Amount (₹)
-                </label>
-                <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-gray-400">
-                    ₹
-                  </span>
+                {/* Supporter Name */}
+                <div className="mb-4">
+                  <label
+                    htmlFor="name"
+                    className="mb-2 block text-xs font-medium uppercase tracking-wider text-gray-300"
+                  >
+                    Your Name or Handle
+                  </label>
                   <input
-                    id="amount"
+                    id="name"
                     onChange={handleChange}
-                    value={paymentform.amount}
-                    name="amount"
-                    type="number"
-                    min="1"
+                    value={paymentform.name}
+                    name="name"
+                    type="text"
                     required
-                    placeholder="100"
-                    className="w-full rounded-xl border border-white/10 bg-black/30 py-3 pl-8 pr-4 text-sm text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400/60 focus:bg-black/50 focus:ring-2 focus:ring-amber-400/10"
+                    placeholder="e.g. Alex"
+                    className="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400/60 focus:bg-black/50 focus:ring-2 focus:ring-amber-400/10"
                   />
                 </div>
-              </div>
 
-              {/* Quick Preset Buttons */}
-              <div className="mb-6">
-                <p className="mb-2 text-[11px] font-medium uppercase tracking-wider text-gray-500">
-                  Quick Amount Presets
-                </p>
-                <div className="grid grid-cols-4 gap-2">
-                  {[50, 100, 250, 500].map((preset) => (
-                    <button
-                      key={preset}
-                      type="button"
-                      onClick={() =>
-                        setPaymentform((prev) => ({
-                          ...prev,
-                          amount: String(preset),
-                        }))
-                      }
-                      className={`rounded-xl border py-2.5 text-xs font-semibold transition ${
-                        paymentform.amount === String(preset)
-                          ? "border-amber-400 bg-amber-400/15 text-amber-400"
-                          : "border-white/10 bg-white/3 text-gray-300 hover:border-white/20 hover:text-white"
-                      }`}
-                    >
-                      ₹{preset}
-                    </button>
-                  ))}
+                {/* Supporter Message */}
+                <div className="mb-4">
+                  <label
+                    htmlFor="message"
+                    className="mb-2 block text-xs font-medium uppercase tracking-wider text-gray-300"
+                  >
+                    Note of Encouragement (Optional)
+                  </label>
+                  <textarea
+                    id="message"
+                    onChange={handleChange}
+                    value={paymentform.message}
+                    name="message"
+                    rows={3}
+                    placeholder="Keep building amazing things!..."
+                    className="w-full resize-none rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400/60 focus:bg-black/50 focus:ring-2 focus:ring-amber-400/10"
+                  />
                 </div>
-              </div>
 
-              {/* Pay Button */}
-              <button
-                type="submit"
-                disabled={
-                  paying ||
-                  !currentUser.razorpayid ||
-                  !paymentform.name.trim() ||
-                  !paymentform.amount ||
-                  Number(paymentform.amount) < 1
-                }
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-linear-to-r from-amber-400 to-orange-500 px-6 py-3.5 text-sm font-bold text-black transition-all duration-200 hover:opacity-95 hover:shadow-lg hover:shadow-orange-500/20 disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none"
-              >
-                {paying ? (
-                  <>
-                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-black/30 border-t-black" />
-                    Opening Razorpay Gateway...
-                  </>
-                ) : (
-                  <>
-                    Support @{username}{" "}
-                    {paymentform.amount &&
-                      Number(paymentform.amount) > 0 &&
-                      ` · ₹${Number(paymentform.amount).toLocaleString("en-IN")}`}
-                  </>
-                )}
-              </button>
+                {/* Amount Selection */}
+                <div className="mb-4">
+                  <label
+                    htmlFor="amount"
+                    className="mb-2 block text-xs font-medium uppercase tracking-wider text-gray-300"
+                  >
+                    Contribution Amount (₹)
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-gray-400">
+                      ₹
+                    </span>
+                    <input
+                      id="amount"
+                      onChange={handleChange}
+                      value={paymentform.amount}
+                      name="amount"
+                      type="number"
+                      min="1"
+                      required
+                      placeholder="100"
+                      className="w-full rounded-xl border border-white/10 bg-black/30 py-3 pl-8 pr-4 text-sm text-white outline-none transition placeholder:text-gray-600 focus:border-amber-400/60 focus:bg-black/50 focus:ring-2 focus:ring-amber-400/10"
+                    />
+                  </div>
+                </div>
 
-              <p className="mt-4 text-center text-[11px] text-gray-500 flex items-center justify-center gap-1.5">
-                <span>🔒</span> Direct payments secured by Razorpay
-              </p>
-            </form>
+                {/* Quick Preset Buttons */}
+                <div className="mb-6">
+                  <p className="mb-2 text-[11px] font-medium uppercase tracking-wider text-gray-500">
+                    Quick Amount Presets
+                  </p>
+                  <div className="grid grid-cols-4 gap-2">
+                    {[50, 100, 250, 500].map((preset) => (
+                      <button
+                        key={preset}
+                        type="button"
+                        onClick={() =>
+                          setPaymentform((prev) => ({
+                            ...prev,
+                            amount: String(preset),
+                          }))
+                        }
+                        className={`rounded-xl border py-2.5 text-xs font-semibold transition ${
+                          paymentform.amount === String(preset)
+                            ? "border-amber-400 bg-amber-400/15 text-amber-400"
+                            : "border-white/10 bg-white/3 text-gray-300 hover:border-white/20 hover:text-white"
+                        }`}
+                      >
+                        ₹{preset}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Pay Button */}
+                <button
+                  type="submit"
+                  disabled={
+                    paying ||
+                    !currentUser.razorpayid ||
+                    !paymentform.name.trim() ||
+                    !paymentform.amount ||
+                    Number(paymentform.amount) < 1
+                  }
+                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-linear-to-r from-amber-400 to-orange-500 px-6 py-3.5 text-sm font-bold text-black transition-all duration-200 hover:opacity-95 hover:shadow-lg hover:shadow-orange-500/20 disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none cursor-pointer"
+                >
+                  {paying ? (
+                    <>
+                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-black/30 border-t-black" />
+                      Opening Razorpay Gateway...
+                    </>
+                  ) : (
+                    <>
+                      Support @{username}{" "}
+                      {paymentform.amount &&
+                        Number(paymentform.amount) > 0 &&
+                        ` · ₹${Number(paymentform.amount).toLocaleString("en-IN")}`}
+                    </>
+                  )}
+                </button>
+
+                <p className="mt-4 text-center text-[11px] text-gray-500 flex items-center justify-center gap-1.5">
+                  <span>🔒</span> Direct payments secured by Razorpay
+                </p>
+              </form>
+            </div>
           </div>
         </section>
       </main>

@@ -88,6 +88,28 @@ export const fetchuser = async (username) => {
       profilepic: u.profilepic || "",
       coverpic: u.coverpic || "",
       bio: u.bio || "",
+      about: u.about || "",
+      currentWork: u.currentWork || "",
+      whySupport: u.whySupport || "",
+      skills: Array.isArray(u.skills) ? u.skills : [],
+      achievements: Array.isArray(u.achievements) ? u.achievements : [],
+      projects: Array.isArray(u.projects)
+        ? u.projects.map((p) => ({
+            name: p.name || "",
+            description: p.description || "",
+            image: p.image || "",
+            github: p.github || "",
+            live: p.live || "",
+            url: p.url || "",
+          }))
+        : [],
+      socialLinks: {
+        github: u.socialLinks?.github || "",
+        linkedin: u.socialLinks?.linkedin || "",
+        portfolio: u.socialLinks?.portfolio || "",
+        twitter: u.socialLinks?.twitter || "",
+        other: u.socialLinks?.other || "",
+      },
       razorpayid: u.razorpayid || "",
       razorpaysecret: isOwner ? u.razorpaysecret || "" : undefined,
     };
@@ -157,6 +179,7 @@ export const updateProfile = async (data, oldusername) => {
       "dashboard",
       "profile",
       "login",
+      "join",
       "about",
       "api",
       "admin",
@@ -221,7 +244,87 @@ export const updateProfile = async (data, oldusername) => {
     const updatedName =
       typeof ndata.name === "string" ? ndata.name.trim() : currentUser.name;
     const updatedBio =
-      typeof ndata.bio === "string" ? ndata.bio.trim() : (currentUser.bio || "");
+      typeof ndata.bio === "string" ? ndata.bio.trim() : currentUser.bio || "";
+    const updatedAbout =
+      typeof ndata.about === "string" ? ndata.about.trim() : currentUser.about || "";
+    const updatedCurrentWork =
+      typeof ndata.currentWork === "string" ? ndata.currentWork.trim() : currentUser.currentWork || "";
+    const updatedWhySupport =
+      typeof ndata.whySupport === "string" ? ndata.whySupport.trim() : currentUser.whySupport || "";
+
+    // Parse and sanitize skills (array or comma-separated string)
+    let updatedSkills = [];
+    if (Array.isArray(ndata.skills)) {
+      updatedSkills = ndata.skills
+        .map((s) => (typeof s === "string" ? s.trim() : ""))
+        .filter((s) => s.length > 0);
+    } else if (typeof ndata.skills === "string") {
+      updatedSkills = ndata.skills
+        .split(",")
+        .map((s) => s.trim())
+        .filter((s) => s.length > 0);
+    } else if (Array.isArray(currentUser.skills)) {
+      updatedSkills = currentUser.skills;
+    }
+
+    // Parse and sanitize achievements (array of strings)
+    let updatedAchievements = [];
+    if (Array.isArray(ndata.achievements)) {
+      updatedAchievements = ndata.achievements
+        .map((a) => (typeof a === "string" ? a.trim() : ""))
+        .filter((a) => a.length > 0);
+    } else if (typeof ndata.achievements === "string" && ndata.achievements.trim()) {
+      updatedAchievements = ndata.achievements
+        .split("\n")
+        .map((a) => a.trim())
+        .filter((a) => a.length > 0);
+    } else if (Array.isArray(currentUser.achievements)) {
+      updatedAchievements = currentUser.achievements;
+    }
+
+    // Parse and sanitize projects
+    let updatedProjects = [];
+    if (Array.isArray(ndata.projects)) {
+      updatedProjects = ndata.projects
+        .filter((p) => p && typeof p === "object" && typeof p.name === "string" && p.name.trim())
+        .map((p) => ({
+          name: p.name.trim(),
+          description: typeof p.description === "string" ? p.description.trim() : "",
+          image: typeof p.image === "string" ? p.image.trim() : "",
+          github: typeof p.github === "string" ? p.github.trim() : "",
+          live: typeof p.live === "string" ? p.live.trim() : "",
+          url: typeof p.url === "string" ? p.url.trim() : "",
+        }));
+    } else if (Array.isArray(currentUser.projects)) {
+      updatedProjects = currentUser.projects;
+    }
+
+    // Parse and sanitize socialLinks
+    let updatedSocialLinks = {
+      github: "",
+      linkedin: "",
+      portfolio: "",
+      twitter: "",
+      other: "",
+    };
+    if (ndata.socialLinks && typeof ndata.socialLinks === "object") {
+      updatedSocialLinks = {
+        github: typeof ndata.socialLinks.github === "string" ? ndata.socialLinks.github.trim() : "",
+        linkedin: typeof ndata.socialLinks.linkedin === "string" ? ndata.socialLinks.linkedin.trim() : "",
+        portfolio: typeof ndata.socialLinks.portfolio === "string" ? ndata.socialLinks.portfolio.trim() : "",
+        twitter: typeof ndata.socialLinks.twitter === "string" ? ndata.socialLinks.twitter.trim() : "",
+        other: typeof ndata.socialLinks.other === "string" ? ndata.socialLinks.other.trim() : "",
+      };
+    } else if (currentUser.socialLinks) {
+      updatedSocialLinks = {
+        github: currentUser.socialLinks.github || "",
+        linkedin: currentUser.socialLinks.linkedin || "",
+        portfolio: currentUser.socialLinks.portfolio || "",
+        twitter: currentUser.socialLinks.twitter || "",
+        other: currentUser.socialLinks.other || "",
+      };
+    }
+
     const updatedRazorpayId =
       typeof ndata.razorpayid === "string" ? ndata.razorpayid.trim() : currentUser.razorpayid;
     const updatedRazorpaySecret =
@@ -234,6 +337,13 @@ export const updateProfile = async (data, oldusername) => {
           name: updatedName,
           username: newUsername,
           bio: updatedBio,
+          about: updatedAbout,
+          currentWork: updatedCurrentWork,
+          whySupport: updatedWhySupport,
+          skills: updatedSkills,
+          achievements: updatedAchievements,
+          projects: updatedProjects,
+          socialLinks: updatedSocialLinks,
           profilepic: trimmedProfilePic,
           coverpic: trimmedCoverPic,
           razorpayid: updatedRazorpayId,
@@ -250,6 +360,13 @@ export const updateProfile = async (data, oldusername) => {
         name: updatedName,
         username: newUsername,
         bio: updatedBio,
+        about: updatedAbout,
+        currentWork: updatedCurrentWork,
+        whySupport: updatedWhySupport,
+        skills: updatedSkills,
+        achievements: updatedAchievements,
+        projects: updatedProjects,
+        socialLinks: updatedSocialLinks,
         profilepic: trimmedProfilePic,
         coverpic: trimmedCoverPic,
         razorpayid: updatedRazorpayId,
@@ -280,6 +397,8 @@ export const fetchCreators = async ({ search = "", skip = 0, limit = 10 } = {}) 
         { username: searchRegex },
         { name: searchRegex },
         { bio: searchRegex },
+        { currentWork: searchRegex },
+        { skills: searchRegex },
       ];
     }
 
@@ -288,7 +407,7 @@ export const fetchCreators = async ({ search = "", skip = 0, limit = 10 } = {}) 
       .sort({ createdAt: -1 })
       .skip(sanitizedSkip)
       .limit(sanitizedLimit)
-      .select("name username profilepic coverpic bio createdAt razorpayid")
+      .select("name username profilepic coverpic bio skills currentWork createdAt razorpayid")
       .lean();
 
     const creators = rawCreators.map((u) => ({
@@ -298,6 +417,8 @@ export const fetchCreators = async ({ search = "", skip = 0, limit = 10 } = {}) 
       profilepic: u.profilepic || "",
       coverpic: u.coverpic || "",
       bio: u.bio || "",
+      skills: Array.isArray(u.skills) ? u.skills : [],
+      currentWork: u.currentWork || "",
       createdAt: u.createdAt ? u.createdAt.toISOString() : null,
       hasPaymentConfigured: Boolean(u.razorpayid),
     }));
