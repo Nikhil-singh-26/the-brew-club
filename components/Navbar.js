@@ -3,89 +3,82 @@
 import React, { useState } from "react";
 import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const Navbar = () => {
   const { data: session } = useSession();
   const [showDropdown, setShowDropdown] = useState(false);
+  const pathname = usePathname();
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-white/10 bg-[#0b0b0f]/90 backdrop-blur-xl">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 md:px-8">
-        {/* Brand Logo */}
-        <Link href="/" className="group flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-br from-amber-400 to-orange-500 shadow-lg shadow-orange-500/20 transition-transform duration-200 group-hover:scale-105">
-            <span className="text-xl">☕</span>
-          </div>
-
-          <div className="flex flex-col leading-none">
-            <span className="text-lg font-bold tracking-tight text-white">
+    <header className="sticky top-0 z-50 border-b border-[#34322C] bg-[#171613]/95 backdrop-blur-md">
+      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
+        {/* Brand */}
+        <div className="flex items-center gap-8">
+          <Link href="/" className="flex items-center gap-2.5 text-[#F4F0E8] transition hover:opacity-90">
+            <span className="flex h-7 w-7 items-center justify-center rounded-[6px] bg-[#282721] border border-[#34322C] text-[#C96F43] text-sm font-semibold">
+              ☕
+            </span>
+            <span className="font-heading text-base font-semibold tracking-tight text-[#F4F0E8]">
               The Brew Club
             </span>
-            <span className="mt-1 hidden text-[10px] font-medium uppercase tracking-[0.18em] text-gray-400 sm:block">
-              Create · Support · Fuel
-            </span>
-          </div>
-        </Link>
+          </Link>
 
-        {/* Center / Right Links */}
-        <div className="flex items-center gap-3 sm:gap-6">
-          <nav className="flex items-center gap-4 sm:gap-6 text-sm font-medium">
+          {/* Navigation Links */}
+          <nav className="hidden md:flex items-center gap-6 text-xs font-medium tracking-normal">
             <Link
               href="/creators"
-              className="text-gray-300 hover:text-amber-300 transition flex items-center gap-1.5"
+              className={`transition ${
+                pathname === "/creators"
+                  ? "text-[#C96F43] font-semibold"
+                  : "text-[#AAA59A] hover:text-[#F4F0E8]"
+              }`}
             >
-              <span>✨</span>
-              <span>Creators</span>
+              Explore creators
             </Link>
             <Link
               href="/about"
-              className="hidden sm:block text-gray-300 hover:text-white transition"
+              className={`transition ${
+                pathname === "/about"
+                  ? "text-[#C96F43] font-semibold"
+                  : "text-[#AAA59A] hover:text-[#F4F0E8]"
+              }`}
             >
               About
             </Link>
           </nav>
+        </div>
 
+        {/* Right Section */}
+        <div className="flex items-center gap-3">
           {session ? (
             <div className="relative">
               <button
+                type="button"
                 onClick={() => setShowDropdown(!showDropdown)}
-                className="flex items-center gap-2.5 rounded-full border border-white/10 bg-white/5 py-1.5 pl-1.5 pr-3 text-sm text-gray-200 transition-all duration-200 hover:border-white/20 hover:bg-white/10"
+                className="flex items-center gap-2 rounded-[7px] border border-[#34322C] bg-[#201F1B] px-2.5 py-1.5 text-xs text-[#F4F0E8] transition hover:border-[#48453D] hover:bg-[#282721] cursor-pointer"
               >
                 {session.user?.profilepic ? (
-                  <>
-                    <img
-                      src={session.user.profilepic}
-                      alt={session.user?.displayName || session.user?.name || "User"}
-                      onError={(e) => {
-                        e.currentTarget.style.display = "none";
-                        const fallback = e.currentTarget.parentElement?.querySelector(".avatar-fallback");
-                        if (fallback) fallback.style.display = "flex";
-                      }}
-                      className="h-8 w-8 rounded-full object-cover"
-                    />
-                    <div
-                      style={{ display: "none" }}
-                      className="avatar-fallback h-8 w-8 items-center justify-center rounded-full bg-linear-to-br from-amber-400 to-orange-500 text-xs font-bold text-black"
-                    >
-                      {(session.user?.displayName || session.user?.name || "U")
-                        .charAt(0)
-                        .toUpperCase()}
-                    </div>
-                  </>
+                  <img
+                    src={session.user.profilepic}
+                    alt={session.user?.displayName || session.user?.name || "Avatar"}
+                    className="h-5 w-5 rounded-[4px] object-cover"
+                    onError={(e) => {
+                      e.currentTarget.style.display = "none";
+                    }}
+                  />
                 ) : (
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-linear-to-br from-amber-400 to-orange-500 text-xs font-bold text-black">
-                    {(session.user?.displayName || session.user?.name || "U")
-                      .charAt(0)
-                      .toUpperCase()}
-                  </div>
+                  <span className="flex h-5 w-5 items-center justify-center rounded-[4px] bg-[#282721] text-[11px] font-bold text-[#C96F43]">
+                    {(session.user?.displayName || session.user?.name || "U").charAt(0).toUpperCase()}
+                  </span>
                 )}
 
-                <span className="hidden max-w-28 truncate font-medium sm:block">
+                <span className="max-w-28 truncate font-medium text-[#F4F0E8]">
                   {session.user?.name || "Account"}
                 </span>
 
                 <svg
-                  className={`h-3.5 w-3.5 text-gray-400 transition-transform duration-200 ${
+                  className={`h-3 w-3 text-[#AAA59A] transition-transform duration-150 ${
                     showDropdown ? "rotate-180" : ""
                   }`}
                   viewBox="0 0 20 20"
@@ -106,70 +99,52 @@ const Navbar = () => {
                     onClick={() => setShowDropdown(false)}
                   />
 
-                  <div className="absolute right-0 top-12 z-50 w-64 overflow-hidden rounded-2xl border border-white/10 bg-[#15151b] shadow-2xl shadow-black/80">
-                    <div className="border-b border-white/10 px-4 py-3.5">
-                      <p className="truncate text-sm font-semibold text-white">
-                        {session.user?.displayName || session.user?.name || "Member"}
+                  <div className="absolute right-0 top-10 z-50 w-56 rounded-[8px] border border-[#34322C] bg-[#201F1B] py-1 shadow-lg">
+                    <div className="border-b border-[#34322C] px-3.5 py-2.5">
+                      <p className="truncate text-xs font-semibold text-[#F4F0E8]">
+                        {session.user?.displayName || session.user?.name}
                       </p>
-                      <p className="truncate text-xs text-amber-400">
-                        @{session.user?.name || "user"}
+                      <p className="truncate text-[11px] text-[#AAA59A]">
+                        @{session.user?.name}
                       </p>
                     </div>
 
-                    <div className="p-2 space-y-1">
+                    <div className="p-1 space-y-0.5 text-xs">
                       <Link
                         href="/dashboard"
                         onClick={() => setShowDropdown(false)}
-                        className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition"
+                        className="flex items-center gap-2 rounded-[5px] px-2.5 py-1.5 text-[#AAA59A] hover:bg-[#282721] hover:text-[#F4F0E8] transition"
                       >
-                        <span>⚙️</span>
-                        <div>
-                          <p className="font-medium">Dashboard</p>
-                          <p className="text-[11px] text-gray-400">
-                            Profile & payment settings
-                          </p>
-                        </div>
+                        <span>Workspace</span>
                       </Link>
 
                       <Link
                         href={`/${session.user?.name}`}
                         onClick={() => setShowDropdown(false)}
-                        className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition"
+                        className="flex items-center gap-2 rounded-[5px] px-2.5 py-1.5 text-[#AAA59A] hover:bg-[#282721] hover:text-[#F4F0E8] transition"
                       >
-                        <span>☕</span>
-                        <div>
-                          <p className="font-medium">Your Creator Page</p>
-                          <p className="text-[11px] text-gray-400">
-                            Public supporter link
-                          </p>
-                        </div>
+                        <span>View your page</span>
                       </Link>
 
                       <Link
                         href="/creators"
                         onClick={() => setShowDropdown(false)}
-                        className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition"
+                        className="flex items-center gap-2 rounded-[5px] px-2.5 py-1.5 text-[#AAA59A] hover:bg-[#282721] hover:text-[#F4F0E8] transition"
                       >
-                        <span>✨</span>
-                        <div>
-                          <p className="font-medium">Discover Creators</p>
-                          <p className="text-[11px] text-gray-400">
-                            Explore creators to support
-                          </p>
-                        </div>
+                        <span>Explore creators</span>
                       </Link>
 
-                      <div className="my-1 border-t border-white/10" />
+                      <div className="my-1 border-t border-[#34322C]" />
 
                       <button
+                        type="button"
                         onClick={() => {
                           setShowDropdown(false);
                           signOut({ callbackUrl: "/" });
                         }}
-                        className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm text-rose-400 hover:bg-rose-500/10 transition"
+                        className="flex w-full items-center gap-2 rounded-[5px] px-2.5 py-1.5 text-[#C85C52] hover:bg-[#282721] transition cursor-pointer"
                       >
-                        <span>🚪</span>
-                        <span className="font-medium">Sign out</span>
+                        <span>Sign out</span>
                       </button>
                     </div>
                   </div>
@@ -180,14 +155,14 @@ const Navbar = () => {
             <div className="flex items-center gap-3">
               <Link
                 href="/login"
-                className="rounded-full px-4 py-2 text-sm font-medium text-gray-300 transition-colors hover:text-white"
+                className="text-xs font-medium text-[#AAA59A] hover:text-[#F4F0E8] transition px-2 py-1"
               >
                 Log in
               </Link>
 
               <Link
                 href="/join"
-                className="rounded-full bg-linear-to-r from-amber-400 to-orange-500 px-4 py-2 text-sm font-semibold text-black transition-all duration-200 hover:opacity-95 hover:shadow-lg hover:shadow-orange-500/20"
+                className="rounded-[7px] bg-[#C96F43] hover:bg-[#D98255] active:bg-[#B55E34] px-3.5 py-1.5 text-xs font-semibold text-[#171613] transition shadow-xs"
               >
                 Join the club
               </Link>
@@ -195,7 +170,7 @@ const Navbar = () => {
           )}
         </div>
       </div>
-    </nav>
+    </header>
   );
 };
 

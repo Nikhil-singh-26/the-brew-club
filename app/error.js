@@ -9,31 +9,27 @@ export default function Error({ error, reset }) {
   }, [error]);
 
   return (
-    <main className="min-h-[70vh] flex flex-col items-center justify-center text-center px-6 bg-[#0b0b0f] text-white">
-      <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-rose-500/10 text-3xl mb-6">
-        ⚠️
-      </div>
-
-      <h1 className="text-3xl font-extrabold tracking-tight">
+    <main className="min-h-[70vh] flex flex-col items-center justify-center text-center px-6 bg-[#171613] text-[#F4F0E8]">
+      <h1 className="font-heading text-2xl sm:text-3xl font-bold tracking-tight">
         Something went wrong
       </h1>
 
-      <p className="mt-3 text-sm text-gray-400 max-w-md">
-        An unexpected error occurred while processing this page.
+      <p className="mt-2 text-xs text-[#AAA59A] max-w-sm">
+        We couldn&apos;t load this information. Please try refreshing or return to the home page.
       </p>
 
-      <div className="flex items-center gap-4 mt-8">
+      <div className="flex items-center gap-3 mt-6">
         <button
           onClick={() => reset()}
-          className="rounded-xl bg-linear-to-r from-amber-400 to-orange-500 px-6 py-3 text-sm font-bold text-black transition hover:opacity-95"
+          className="rounded-[7px] bg-[#C96F43] hover:bg-[#D98255] px-4 py-2 text-xs font-medium text-white transition-colors cursor-pointer"
         >
-          Try Again
+          Try again
         </button>
         <Link
           href="/"
-          className="rounded-xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+          className="rounded-[7px] border border-[#34322C] bg-[#201F1B] hover:bg-[#282721] px-4 py-2 text-xs font-medium text-[#F4F0E8] transition-colors"
         >
-          Return Home
+          Back to home
         </Link>
       </div>
     </main>

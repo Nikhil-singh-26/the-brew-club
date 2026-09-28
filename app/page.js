@@ -1,178 +1,119 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: "The Brew Club - Creator Crowdfunding & Direct Supporter Platform",
+  title: "The Brew Club — Good work deserves good people behind it",
   description:
-    "A direct creator-support platform where fans and supporters back the projects, ideas, and builders they believe in.",
+    "The Brew Club is a place where creators can share what they're working on and the people who enjoy their work can lend a hand.",
 };
 
 export default function Home() {
   return (
-    <main className="bg-[#0b0b0f] text-white overflow-hidden">
+    <main className="min-h-[calc(100vh-120px)] bg-[#171613] text-[#F4F0E8]">
       {/* Hero Section */}
-      <section className="relative min-h-[75vh] flex items-center justify-center px-6 py-16">
-        <div className="absolute top-20 left-1/2 -translate-x-1/2 w-120 h-72 bg-linear-to-r from-amber-500/15 to-orange-500/15 blur-[120px] rounded-full pointer-events-none" />
-
-        <div className="relative z-10 max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 mb-6 rounded-full border border-white/10 bg-white/5 text-xs font-medium text-amber-300">
+      <section className="mx-auto max-w-4xl px-4 pt-20 pb-16 sm:px-6 sm:pt-28 sm:pb-24">
+        <div className="space-y-6">
+          <div className="inline-flex items-center gap-2 rounded-[6px] border border-[#34322C] bg-[#201F1B] px-3 py-1 text-xs font-medium text-[#C96F43]">
             <span>☕</span>
-            Fuel the work of independent creators
+            <span>Independent creator support</span>
           </div>
 
-          <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight">
-            Empower creators,{" "}
-            <span className="bg-linear-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">
-              one brew at a time.
-            </span>
+          <h1 className="font-heading text-4xl sm:text-6xl md:text-7xl font-semibold tracking-tight text-[#F4F0E8] leading-[1.08]">
+            Good work deserves <br className="hidden sm:block" />
+            good people behind it.
           </h1>
 
-          <p className="mt-6 text-base sm:text-lg md:text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
-            The Brew Club makes it effortless for creators to fund their craft
-            through direct supporter contributions. No middleman friction, just
-            genuine support for what you build.
+          <p className="max-w-2xl text-base sm:text-lg text-[#AAA59A] leading-relaxed">
+            The Brew Club is a place where creators can share what they&apos;re working on and the people who enjoy their work can lend a hand. Direct support, zero fluff.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
+          <div className="flex flex-wrap items-center gap-3 pt-2">
             <Link
               href="/creators"
-              className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-linear-to-r from-amber-400 to-orange-500 hover:opacity-95 text-black font-bold transition-all duration-200 hover:-translate-y-0.5 shadow-lg shadow-orange-500/20 text-center flex items-center justify-center gap-2"
+              className="rounded-[7px] bg-[#C96F43] hover:bg-[#D98255] active:bg-[#B55E34] px-5 py-2.5 text-xs sm:text-sm font-semibold text-[#171613] transition shadow-xs"
             >
-              <span>✨</span>
-              <span>Discover Creators →</span>
+              Explore creators
             </Link>
 
             <Link
               href="/join"
-              className="w-full sm:w-auto px-8 py-3.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-white font-semibold transition-all duration-200 text-center"
+              className="rounded-[7px] border border-[#34322C] bg-[#201F1B] hover:bg-[#282721] hover:border-[#48453D] px-5 py-2.5 text-xs sm:text-sm font-medium text-[#F4F0E8] transition"
             >
-              Start Your Creator Page
+              Start creating
             </Link>
           </div>
-
-          <p className="mt-5 text-xs text-gray-500">
-            Quick 2-minute setup · Direct Razorpay payouts · Zero platform lock-in
-          </p>
         </div>
       </section>
 
-      {/* Feature Highlights */}
-      <section className="max-w-6xl mx-auto px-6 py-20 border-t border-white/10">
-        <div className="text-center max-w-2xl mx-auto">
-          <p className="text-amber-400 text-xs font-bold uppercase tracking-[0.2em] mb-2">
-            Why The Brew Club
-          </p>
-          <h2 className="text-2xl sm:text-4xl font-bold tracking-tight">
-            Designed for genuine creator connections
-          </h2>
-          <p className="mt-3 text-sm text-gray-400">
-            Everything you need to turn your supporters&apos; appreciation into sustainable creative momentum.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
-          {/* Feature 1 */}
-          <div className="rounded-3xl border border-white/10 bg-white/2 p-8 hover:bg-white/4 transition">
-            <div className="w-12 h-12 flex items-center justify-center rounded-2xl bg-amber-400/10 text-2xl mb-6">
-              🎨
-            </div>
-            <h3 className="text-lg font-bold mb-2 text-white">
-              Your Personal Creator Space
-            </h3>
-            <p className="text-gray-400 text-xs leading-relaxed">
-              Create a custom public profile with your banner, avatar, bio, and direct contribution link to share with your audience.
+      {/* Editorial Principles Section */}
+      <section className="border-t border-[#34322C] bg-[#171613]">
+        <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6 sm:py-20">
+          <div className="mb-12">
+            <h2 className="font-heading text-xl sm:text-2xl font-semibold text-[#F4F0E8]">
+              Built for people who make things
+            </h2>
+            <p className="mt-2 text-sm text-[#AAA59A]">
+              A quiet, dependable platform to share your journey and receive support from your audience.
             </p>
           </div>
 
-          {/* Feature 2 */}
-          <div className="rounded-3xl border border-white/10 bg-white/2 p-8 hover:bg-white/4 transition">
-            <div className="w-12 h-12 flex items-center justify-center rounded-2xl bg-amber-400/10 text-2xl mb-6">
-              ⚡
-            </div>
-            <h3 className="text-lg font-bold mb-2 text-white">
-              Direct & Instant Payments
-            </h3>
-            <p className="text-gray-400 text-xs leading-relaxed">
-              Receive funds straight into your linked Razorpay gateway with instant verification, UPI, card, and net banking support.
-            </p>
-          </div>
-
-          {/* Feature 3 */}
-          <div className="rounded-3xl border border-white/10 bg-white/2 p-8 hover:bg-white/4 transition">
-            <div className="w-12 h-12 flex items-center justify-center rounded-2xl bg-amber-400/10 text-2xl mb-6">
-              💬
-            </div>
-            <h3 className="text-lg font-bold mb-2 text-white">
-              Supporter Community Wall
-            </h3>
-            <p className="text-gray-400 text-xs leading-relaxed">
-              Celebrate your supporters with real-time contribution messages, badges, and transparent public backing counts.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Discover Creators Section */}
-      <section className="px-6 pb-20">
-        <div className="max-w-6xl mx-auto rounded-3xl border border-amber-400/20 bg-linear-to-b from-amber-500/10 via-white/2 to-transparent p-8 sm:p-14">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-            <div className="max-w-xl text-center md:text-left">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-amber-400/30 bg-amber-400/10 text-xs font-semibold text-amber-300 mb-4">
-                <span>✨</span> Supporter Discovery
-              </div>
-              <h2 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
-                Discover creators worth supporting
-              </h2>
-              <p className="mt-4 text-sm text-gray-300 leading-relaxed">
-                The Brew Club helps people discover creators and support the work they&apos;re building. Explore builders, artists, writers, and makers funding their craft directly.
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10">
+            <div className="space-y-2">
+              <span className="text-xs font-mono font-semibold text-[#C96F43]">01</span>
+              <h3 className="font-heading text-base font-semibold text-[#F4F0E8]">
+                Direct to your account
+              </h3>
+              <p className="text-xs sm:text-sm text-[#AAA59A] leading-relaxed">
+                Connect your personal Razorpay link or custom gateway. Contributions flow directly to you with clear verification.
               </p>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 shrink-0">
-              <Link
-                href="/creators"
-                className="px-8 py-3.5 rounded-xl bg-linear-to-r from-amber-400 to-orange-500 hover:opacity-95 text-black font-bold transition-all duration-200 hover:-translate-y-0.5 shadow-lg shadow-orange-500/20 text-center"
-              >
-                Browse All Creators →
-              </Link>
+            <div className="space-y-2">
+              <span className="text-xs font-mono font-semibold text-[#C96F43]">02</span>
+              <h3 className="font-heading text-base font-semibold text-[#F4F0E8]">
+                Your personal page
+              </h3>
+              <p className="text-xs sm:text-sm text-[#AAA59A] leading-relaxed">
+                A clean, focused space for what you&apos;re currently building, your story, your featured projects, and why support matters.
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <span className="text-xs font-mono font-semibold text-[#C96F43]">03</span>
+              <h3 className="font-heading text-base font-semibold text-[#F4F0E8]">
+                Genuine community
+              </h3>
+              <p className="text-xs sm:text-sm text-[#AAA59A] leading-relaxed">
+                Real messages of encouragement from supporters who believe in your work. No artificial metrics or distracting noise.
+              </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Quote Banner */}
-      <section className="px-6 pb-20">
-        <div className="max-w-4xl mx-auto rounded-3xl border border-white/10 bg-linear-to-br from-amber-500/10 via-white/2 to-transparent p-8 sm:p-12 text-center">
-          <span className="text-3xl">☕</span>
-          <p className="mt-4 text-xl sm:text-2xl font-medium text-gray-200 leading-relaxed">
-            &ldquo;A small vote of confidence from a supporter can be the exact spark that turns a side project into something extraordinary.&rdquo;
-          </p>
-          <p className="mt-4 text-xs font-semibold text-amber-400 uppercase tracking-widest">
-            The Brew Club Mission
-          </p>
-        </div>
-      </section>
+      {/* Callout Section */}
+      <section className="border-t border-[#34322C] bg-[#201F1B]">
+        <div className="mx-auto max-w-4xl px-4 py-14 sm:px-6 sm:py-16 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+          <div className="space-y-1 max-w-lg">
+            <h2 className="font-heading text-lg sm:text-xl font-semibold text-[#F4F0E8]">
+              Ready to set up your creator space?
+            </h2>
+            <p className="text-xs sm:text-sm text-[#AAA59A]">
+              It takes less than two minutes to configure your profile and start receiving support.
+            </p>
+          </div>
 
-      {/* Bottom CTA */}
-      <section className="px-6 pb-24 border-t border-white/10 pt-16">
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white">
-            Ready to claim your creator page?
-          </h2>
-          <p className="mt-4 text-sm text-gray-400">
-            Join other passionate builders, creators, and artists who are funded by their own community.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
+          <div className="flex items-center gap-3 shrink-0">
             <Link
               href="/join"
-              className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-linear-to-r from-amber-400 to-orange-500 hover:opacity-95 text-black font-bold transition-all duration-200 hover:-translate-y-0.5 shadow-lg shadow-orange-500/20"
+              className="rounded-[7px] bg-[#C96F43] hover:bg-[#D98255] active:bg-[#B55E34] px-4 py-2 text-xs font-semibold text-[#171613] transition"
             >
-              Get Started with The Brew Club →
+              Join The Brew Club
             </Link>
             <Link
               href="/creators"
-              className="w-full sm:w-auto px-8 py-3.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-white font-semibold transition-all duration-200 text-center"
+              className="rounded-[7px] border border-[#34322C] bg-[#282721] hover:bg-[#2F2D27] px-4 py-2 text-xs font-medium text-[#F4F0E8] transition"
             >
-              Explore Creators
+              Browse creators
             </Link>
           </div>
         </div>

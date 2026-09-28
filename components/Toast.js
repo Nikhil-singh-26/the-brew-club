@@ -35,27 +35,35 @@ export const ToastProvider = ({ children }) => {
   return (
     <ToastContext.Provider value={{ toast: toastMethods }}>
       {children}
-      <div className="fixed bottom-5 right-5 z-50 flex flex-col gap-2.5 max-w-sm pointer-events-none">
+      <div className="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm pointer-events-none">
         {toasts.map((t) => (
           <div
             key={t.id}
-            className={`pointer-events-auto flex items-start gap-3 rounded-2xl border px-4 py-3.5 shadow-2xl backdrop-blur-xl transition-all duration-300 animate-in fade-in slide-in-from-bottom-2 ${
+            className={`pointer-events-auto flex items-start gap-2.5 rounded-[8px] border px-3.5 py-2.5 shadow-lg backdrop-blur-md transition-all duration-200 ${
               t.type === "success"
-                ? "border-emerald-500/30 bg-[#0f1d16]/95 text-emerald-200 shadow-emerald-950/40"
+                ? "border-[#7E9B72]/40 bg-[#201F1B] text-[#F4F0E8]"
                 : t.type === "error"
-                ? "border-rose-500/30 bg-[#1d0f12]/95 text-rose-200 shadow-rose-950/40"
-                : "border-amber-500/30 bg-[#1a160f]/95 text-amber-200 shadow-amber-950/40"
+                ? "border-[#C85C52]/40 bg-[#201F1B] text-[#F4F0E8]"
+                : "border-[#34322C] bg-[#201F1B] text-[#F4F0E8]"
             }`}
           >
-            <span className="text-lg">
+            <span
+              className={`text-xs font-bold ${
+                t.type === "success"
+                  ? "text-[#7E9B72]"
+                  : t.type === "error"
+                  ? "text-[#C85C52]"
+                  : "text-[#C96F43]"
+              }`}
+            >
               {t.type === "success" ? "✓" : t.type === "error" ? "✕" : "☕"}
             </span>
-            <div className="flex-1 text-xs font-medium leading-relaxed">
+            <div className="flex-1 text-xs leading-relaxed text-[#F4F0E8]">
               {t.message}
             </div>
             <button
               onClick={() => removeToast(t.id)}
-              className="text-gray-400 hover:text-white transition-colors text-xs ml-1"
+              className="text-[#77736B] hover:text-[#AAA59A] text-xs transition-colors ml-1 cursor-pointer"
               aria-label="Dismiss notification"
             >
               ✕

@@ -46,7 +46,7 @@ const CreatorCard = ({ creator }) => {
         const res = await saveCreator(creator.username);
         if (res?.success) {
           setIsSaved(true);
-          toast.success("Creator bookmarked! 🔖");
+          toast.success("Creator saved to bookmarks.");
         }
       }
     } catch (err) {
@@ -59,27 +59,26 @@ const CreatorCard = ({ creator }) => {
   return (
     <Link
       href={`/${creator.username}`}
-      className="group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-white/10 bg-white/3 p-0 transition-all duration-300 hover:-translate-y-1 hover:border-amber-400/40 hover:bg-white/5 hover:shadow-xl hover:shadow-amber-500/5 focus:outline-none focus:ring-2 focus:ring-amber-400/50"
+      className="group relative flex flex-col justify-between overflow-hidden rounded-[10px] border border-[#34322C] bg-[#201F1B] transition-all duration-200 hover:border-[#77736B]/50 hover:bg-[#282721] focus:outline-none focus:ring-2 focus:ring-[#C96F43]/40"
     >
-      {/* Top Banner snippet */}
-      <div className="relative h-24 w-full overflow-hidden bg-linear-to-r from-amber-500/15 via-[#1c1813] to-orange-500/15">
+      {/* Top Cover Snippet */}
+      <div className="relative h-20 w-full overflow-hidden bg-[#171613] border-b border-[#34322C]">
         {creator.coverpic && !coverError ? (
           <img
             src={creator.coverpic}
             alt={`${displayName}'s cover`}
             onError={() => setCoverError(true)}
-            className="h-full w-full object-cover opacity-70 transition-transform duration-500 group-hover:scale-105"
+            className="h-full w-full object-cover opacity-60 transition-opacity duration-300 group-hover:opacity-80"
           />
         ) : (
-          <div className="h-full w-full bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-amber-500/20 via-transparent to-transparent" />
+          <div className="h-full w-full bg-[#171613]" />
         )}
-        <div className="absolute inset-0 bg-linear-to-t from-[#0f0f14] via-transparent to-black/20" />
 
         {/* Top Badges & Bookmark */}
         <div className="absolute top-2.5 right-2.5 flex items-center gap-1.5 z-10">
           {creator.hasPaymentConfigured && (
-            <div className="rounded-full border border-amber-400/30 bg-black/70 px-2 py-0.5 text-[9px] font-medium text-amber-300 backdrop-blur-md">
-              ☕ Accepts Support
+            <div className="rounded-[6px] border border-[#34322C] bg-[#171613]/90 px-2 py-0.5 text-[10px] font-medium text-[#E9DFD0]">
+              Accepts support
             </div>
           )}
 
@@ -87,71 +86,71 @@ const CreatorCard = ({ creator }) => {
             type="button"
             onClick={handleBookmark}
             disabled={saving}
-            className={`rounded-full border p-1 backdrop-blur-md transition cursor-pointer ${
+            className={`rounded-[6px] border px-2 py-1 transition cursor-pointer text-xs ${
               isSaved
-                ? "border-rose-500/40 bg-rose-500/20 text-rose-300"
-                : "border-white/10 bg-black/60 text-gray-400 hover:text-rose-400 hover:bg-black/80"
+                ? "border-[#C96F43]/40 bg-[#C96F43]/15 text-[#C96F43]"
+                : "border-[#34322C] bg-[#171613]/80 text-[#AAA59A] hover:text-[#F4F0E8] hover:bg-[#282721]"
             }`}
             title={isSaved ? "Saved" : "Save creator"}
           >
-            <span className="text-xs">{isSaved ? "❤️" : "🤍"}</span>
+            {isSaved ? "Saved" : "Save"}
           </button>
         </div>
       </div>
 
-      {/* Profile Avatar & Info */}
-      <div className="relative -mt-10 px-6 pb-6 flex-1 flex flex-col">
-        <div className="mb-4">
-          <div className="inline-block rounded-2xl border-4 border-[#0e0e13] bg-[#15151c] shadow-lg">
+      {/* Profile Avatar & Details */}
+      <div className="relative -mt-7 px-5 pb-5 flex-1 flex flex-col">
+        {/* Avatar */}
+        <div className="mb-3">
+          <div className="inline-block rounded-[8px] border-2 border-[#201F1B] bg-[#171613] overflow-hidden">
             {creator.profilepic && !imgError ? (
               <img
                 src={creator.profilepic}
                 alt={displayName}
                 onError={() => setImgError(true)}
-                className="h-16 w-16 rounded-xl object-cover"
+                className="h-14 w-14 rounded-[6px] object-cover"
               />
             ) : (
-              <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-linear-to-br from-amber-400 to-orange-500 text-2xl font-extrabold text-black">
+              <div className="flex h-14 w-14 items-center justify-center bg-[#282721] text-lg font-bold text-[#E9DFD0]">
                 {initial}
               </div>
             )}
           </div>
         </div>
 
-        {/* Creator Names */}
+        {/* Name & Handle */}
         <div>
-          <h3 className="truncate text-lg font-bold text-white transition-colors group-hover:text-amber-300">
+          <h3 className="font-heading text-base font-semibold text-[#F4F0E8] group-hover:text-[#E9DFD0] transition-colors truncate">
             {displayName}
           </h3>
-          <p className="truncate text-xs font-medium text-amber-400/90">
+          <p className="text-xs text-[#C96F43] truncate">
             @{creator.username}
           </p>
         </div>
 
-        {/* Creator Bio / Description */}
-        <p className="mt-3 text-xs leading-relaxed text-gray-400 line-clamp-2">
+        {/* Bio */}
+        <p className="mt-2.5 text-xs leading-relaxed text-[#AAA59A] line-clamp-2">
           {creator.bio && creator.bio.trim()
             ? creator.bio
-            : "Independent creator building and sharing creative work on The Brew Club."}
+            : "Building and sharing creative work on The Brew Club."}
         </p>
 
-        {/* Currently Building indicator if available */}
+        {/* Currently Building */}
         {creator.currentWork && creator.currentWork.trim() && (
-          <p className="mt-2 text-[11px] text-amber-300/90 truncate flex items-center gap-1">
-            <span>🔨</span>
-            <span className="truncate">{creator.currentWork}</span>
+          <p className="mt-2 text-[11px] text-[#E9DFD0]/90 truncate">
+            <span className="text-[#77736B]">Building:</span> {creator.currentWork}
           </p>
         )}
 
-        {/* Skill tags if available */}
+        {/* Skills */}
         {skills.length > 0 && (
-          <div className="mt-3 flex flex-wrap gap-1.5">
+          <div className="mt-3 flex flex-wrap gap-1">
             {skills.map((skill, idx) => (
               <span
                 key={idx}
-                className="rounded-md border border-white/5 bg-white/4 px-2 py-0.5 text-[10px] font-medium text-gray-300"
+                className="rounded-[6px] border border-[#34322C] bg-[#171613] px-2 py-0.5 text-[10px] text-[#AAA59A]"
               >
-                #{skill}
+                {skill}
               </span>
             ))}
           </div>
@@ -159,10 +158,10 @@ const CreatorCard = ({ creator }) => {
 
         <div className="flex-1" />
 
-        {/* Card Action */}
-        <div className="mt-5 flex items-center justify-between border-t border-white/5 pt-4 text-xs font-semibold text-gray-300 transition-colors group-hover:text-amber-400">
-          <span>View Creator Portfolio</span>
-          <span className="transition-transform duration-200 group-hover:translate-x-1">
+        {/* Bottom Action Divider */}
+        <div className="mt-4 flex items-center justify-between border-t border-[#34322C] pt-3 text-xs font-medium text-[#AAA59A] group-hover:text-[#F4F0E8] transition-colors">
+          <span>View profile</span>
+          <span className="text-[#C96F43] transition-transform duration-200 group-hover:translate-x-0.5">
             →
           </span>
         </div>

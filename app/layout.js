@@ -1,18 +1,31 @@
+import { Instrument_Sans, Inter } from "next/font/google";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import "./globals.css";
 import SessionWrapper from "@/components/SessionWrapper";
 
+const instrumentSans = Instrument_Sans({
+  subsets: ["latin"],
+  variable: "--font-heading",
+  display: "swap",
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-body",
+  display: "swap",
+});
+
 export const metadata = {
-  title: "The Brew Club - Creator Crowdfunding & Direct Supporter Platform",
+  title: "The Brew Club — Independent Creator Support & Community Platform",
   description:
-    "The Brew Club is a creator-support and community crowdfunding platform where supporters can back their favorite creators, builders, and artists.",
+    "A direct creator-support platform where people can back the builders, writers, and makers they admire.",
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body className="bg-[#0b0b0f] text-white min-h-screen flex flex-col selection:bg-amber-400 selection:text-black">
+    <html lang="en" className={`${instrumentSans.variable} ${inter.variable}`}>
+      <body className="bg-[#171613] text-[#F4F0E8] min-h-screen flex flex-col antialiased selection:bg-[#C96F43] selection:text-[#171613]">
         <SessionWrapper>
           <Navbar />
           <div className="flex-1">

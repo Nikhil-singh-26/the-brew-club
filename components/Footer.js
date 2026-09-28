@@ -5,49 +5,42 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-white/10 bg-[#07070a] text-gray-400">
-      <div className="mx-auto max-w-7xl px-6 py-8">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-br from-amber-400 to-orange-500 text-sm font-bold text-black">
-              ☕
+    <footer className="border-t border-[#34322C] bg-[#171613] text-[#AAA59A]">
+      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 text-[#F4F0E8] font-heading font-semibold text-sm">
+              <span className="text-[#C96F43]">☕</span>
+              <span>The Brew Club</span>
             </div>
-            <div>
-              <p className="text-sm font-bold text-white tracking-wide">
-                The Brew Club
-              </p>
-              <p className="text-xs text-gray-500">
-                Direct community crowdfunding for creators and builders.
-              </p>
-            </div>
+            <p className="text-xs text-[#77736B]">
+              Brewing good moments, one cup at a time. Direct creator support.
+            </p>
           </div>
 
-          <div className="flex items-center gap-6 text-xs text-gray-400">
-            <Link href="/" className="hover:text-white transition">
+          <div className="flex flex-wrap items-center gap-5 text-xs text-[#AAA59A]">
+            <Link href="/" className="hover:text-[#F4F0E8] transition">
               Home
             </Link>
-            <Link href="/creators" className="hover:text-white transition text-amber-400/90 font-medium">
-              Creators
+            <Link href="/creators" className="hover:text-[#F4F0E8] transition">
+              Explore creators
             </Link>
-            <Link href="/about" className="hover:text-white transition">
+            <Link href="/about" className="hover:text-[#F4F0E8] transition">
               About
             </Link>
-            <Link href="/login" className="hover:text-white transition">
+            <Link href="/login" className="hover:text-[#F4F0E8] transition">
               Sign In
             </Link>
-            <Link href="/dashboard" className="hover:text-white transition">
-              Dashboard
+            <Link href="/dashboard" className="hover:text-[#F4F0E8] transition">
+              Workspace
             </Link>
           </div>
         </div>
 
-        <div className="my-6 h-px bg-white/5" />
-
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-500">
-          <p>© {currentYear} The Brew Club. All rights reserved.</p>
-          <p>
-            Built for creators with <span className="text-rose-400">♥</span> and{" "}
-            <span className="text-amber-400">☕</span>
+        <div className="mt-8 pt-4 border-t border-[#25241F] flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-[#77736B]">
+          <p>© {currentYear} The Brew Club. An independent platform for creators and supporters.</p>
+          <p className="text-[#77736B]">
+            Crafted for makers who build in the open.
           </p>
         </div>
       </div>

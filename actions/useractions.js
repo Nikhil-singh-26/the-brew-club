@@ -416,10 +416,15 @@ export const updateProfile = async (data, oldusername) => {
     let updatedRazorpayLink =
       typeof ndata.razorpayLink === "string" ? ndata.razorpayLink.trim() : (currentUser.razorpayLink || "");
 
-    if (updatedRazorpayLink && !isValidHttpUrl(updatedRazorpayLink)) {
-      return {
-        error: "Please enter a valid Payment Link starting with https:// (e.g. https://razorpay.me/@username or https://rzp.io/...)",
-      };
+    if (updatedRazorpayLink) {
+      if (!updatedRazorpayLink.startsWith("http://") && !updatedRazorpayLink.startsWith("https://")) {
+        updatedRazorpayLink = `https://${updatedRazorpayLink}`;
+      }
+      if (!isValidHttpUrl(updatedRazorpayLink)) {
+        return {
+          error: "Please enter a valid Payment Link (e.g. https://razorpay.me/@username or https://rzp.io/...)",
+        };
+      }
     }
 
     if (updatedPaymentMethod === "razorpay_link" && !updatedRazorpayLink) {
@@ -1155,5 +1160,142 @@ export const moderateReport = async ({ reportId, status }) => {
   } catch (error) {
     console.error("Error in moderateReport:", error);
     return { success: false, error: "Failed to update report." };
+  }
+};
+
+// ============================================================================
+// 13. SYNC HISTORICAL / LIVE PAYMENTS FROM RAZORPAY API
+// ============================================================================
+export const syncCreatorPayments = async (creatorUsername) => {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user?.email) {
+      return { success: false, error: "Unauthorized." };
+    }
+
+    await connectDb();
+
+    const currentUser = await User.findOne({ email: session.user.email });
+    if (!currentUser) {
+      return { success: false, error: "User not found." };
+    }
+
+    const targetUsername = (creatorUsername || currentUser.username).toLowerCase().trim();
+    if (currentUser.username !== targetUsername && currentUser.role !== "admin") {
+      return { success: false, error: "Forbidden: You can only sync your own payments." };
+    }
+
+    const keyId = currentUser.razorpayid?.trim() || process.env.NEXT_PUBLIC_KEY_ID?.trim();
+    const keySecret = currentUser.razorpaysecret?.trim() || process.env.KEY_SECRET?.trim();
+
+    if (!keyId || !keySecret) {
+      return {
+        success: false,
+        error: "Razorpay credentials not configured. Please configure your Razorpay Key ID and Secret.",
+      };
+    }
+
+    const instance = new Razorpay({
+      key_id: keyId,
+      key_secret: keySecret,
+    });
+
+    const rzpPayments = await instance.payments.all({ count: 50 });
+    let syncedCount = 0;
+
+    for (const p of (rzpPayments?.items || [])) {
+      if (p.status === "captured") {
+        const orderId = p.order_id;
+        const paymentId = p.id;
+        const amountInRupees = Number(p.amount) / 100;
+        const noteCreator = p.notes?.creator || p.notes?.to_user || p.notes?.username;
+        const descMatch = (p.description || "").match(/@([a-zA-Z0-9_-]+)/);
+        const descCreator = descMatch ? descMatch[1] : null;
+
+        const isMatch =
+          noteCreator?.toLowerCase() === targetUsername ||
+          descCreator?.toLowerCase() === targetUsername ||
+          (!noteCreator && currentUser.razorpayid && keyId === currentUser.razorpayid);
+
+        if (isMatch || orderId) {
+          const existing = await Payment.findOne({
+            $or: [
+              ...(orderId ? [{ oid: orderId }] : []),
+              { paymentId: paymentId },
+            ],
+          });
+
+          const supporterMsg =
+            p.notes?.message ||
+            p.notes?.note ||
+            p.notes?.comment ||
+            p.notes?.supporter_message ||
+            "";
+          const supporterEmail = p.email || "";
+          const isAnon = Boolean(p.notes?.isAnonymous === "true" || p.notes?.isAnonymous === true);
+          const rawName = p.notes?.name || (p.email ? p.email.split("@")[0] : "Supporter");
+          const supporterName = isAnon ? "Anonymous Supporter" : rawName;
+
+          if (existing) {
+            if (!existing.done || !existing.paymentId) {
+              await Payment.updateOne(
+                { _id: existing._id },
+                {
+                  $set: {
+                    done: true,
+                    paymentId: paymentId,
+                    amount: amountInRupees > 0 ? amountInRupees : existing.amount,
+                    message: supporterMsg || existing.message,
+                    supporter_email: supporterEmail || existing.supporter_email,
+                    name: supporterName || existing.name,
+                    isAnonymous: isAnon,
+                  },
+                }
+              );
+              syncedCount++;
+            }
+          } else if (isMatch) {
+            await Payment.create({
+              name: supporterName,
+              to_user: targetUsername,
+              supporter_email: supporterEmail,
+              oid: orderId || `oid_${paymentId}`,
+              paymentId: paymentId,
+              paymentMethod: p.notes?.payment_link ? "razorpay_link" : "razorpay_gateway",
+              message: supporterMsg,
+              amount: amountInRupees,
+              done: true,
+              isAnonymous: isAnon,
+            });
+            syncedCount++;
+
+            try {
+              await Notification.create({
+                recipientUsername: targetUsername,
+                type: "payment",
+                title: `Received ₹${amountInRupees.toLocaleString("en-IN")} from ${supporterName}`,
+                message: supporterMsg || "Supported via Razorpay",
+                amount: amountInRupees,
+              });
+            } catch (_) {}
+          }
+        }
+      }
+    }
+
+    const totalVerified = await Payment.countDocuments({
+      to_user: targetUsername,
+      done: true,
+    });
+
+    return {
+      success: true,
+      syncedCount,
+      totalVerified,
+      message: `Synchronized successfully. ${syncedCount} new/updated payments processed (${totalVerified} total verified).`,
+    };
+  } catch (error) {
+    console.error("Error in syncCreatorPayments:", error);
+    return { success: false, error: error.message || "Failed to sync payments from Razorpay." };
   }
 };
