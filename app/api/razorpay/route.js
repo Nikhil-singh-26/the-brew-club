@@ -3,6 +3,7 @@ import { validatePaymentVerification } from "razorpay/dist/utils/razorpay-utils"
 import Payment from "@/models/Payment";
 import connectDb from "@/db/connectDb";
 import User from "@/models/User";
+import Notification from "@/models/Notification";
 
 export const POST = async (req) => {
   try {
@@ -56,9 +57,22 @@ export const POST = async (req) => {
     if (isValid) {
       const updatedPayment = await Payment.findOneAndUpdate(
         { oid: razorpay_order_id },
-        { done: true },
+        { done: true, paymentId: razorpay_payment_id || "" },
         { new: true }
       );
+
+      // Create in-app notification for the creator
+      try {
+        await Notification.create({
+          recipientUsername: updatedPayment.to_user,
+          type: "payment",
+          title: `Received ₹${(updatedPayment.amount / 100).toLocaleString("en-IN")} from ${updatedPayment.isAnonymous ? "Anonymous Supporter" : updatedPayment.name}`,
+          message: updatedPayment.message || "No message attached",
+          amount: updatedPayment.amount / 100,
+        });
+      } catch (notifErr) {
+        console.error("Failed to create notification on payment:", notifErr);
+      }
 
       const redirectUrl = new URL(`/${updatedPayment.to_user}`, origin);
       redirectUrl.searchParams.set("paymentdone", "true");

@@ -164,9 +164,12 @@ export const authOptions = {
             session.user.profilepic = dbUser.profilepic || "";
             session.user.image = dbUser.profilepic || "";
             session.user.email = dbUser.email;
+            session.user.role = dbUser.role || "user";
+            session.user.id = dbUser._id.toString();
           } else {
             session.user.profilepic = "";
             session.user.image = "";
+            session.user.role = "user";
           }
         }
       } catch (error) {

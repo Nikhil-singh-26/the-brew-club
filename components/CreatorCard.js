@@ -2,16 +2,59 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
+import { saveCreator, unsaveCreator } from "@/actions/useractions";
+import { useToast } from "./Toast";
 
 const CreatorCard = ({ creator }) => {
+  const { data: session } = useSession();
+  const { toast } = useToast();
   const [imgError, setImgError] = useState(false);
   const [coverError, setCoverError] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   if (!creator || !creator.username) return null;
 
   const displayName = creator.name || creator.username;
   const initial = (displayName.charAt(0) || "C").toUpperCase();
   const skills = Array.isArray(creator.skills) ? creator.skills.slice(0, 3) : [];
+
+  const handleBookmark = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!session?.user) {
+      toast.error("Please sign in to save creators.");
+      return;
+    }
+
+    if (session.user.name === creator.username) {
+      toast.error("You cannot bookmark your own profile.");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      if (isSaved) {
+        const res = await unsaveCreator(creator.username);
+        if (res?.success) {
+          setIsSaved(false);
+          toast.success("Bookmark removed.");
+        }
+      } else {
+        const res = await saveCreator(creator.username);
+        if (res?.success) {
+          setIsSaved(true);
+          toast.success("Creator bookmarked! 🔖");
+        }
+      }
+    } catch (err) {
+      toast.error("Could not update bookmark.");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <Link
@@ -32,12 +75,28 @@ const CreatorCard = ({ creator }) => {
         )}
         <div className="absolute inset-0 bg-linear-to-t from-[#0f0f14] via-transparent to-black/20" />
 
-        {/* Payment support badge */}
-        {creator.hasPaymentConfigured && (
-          <div className="absolute top-3 right-3 rounded-full border border-amber-400/30 bg-black/60 px-2.5 py-1 text-[10px] font-medium text-amber-300 backdrop-blur-md">
-            ☕ Accepting Support
-          </div>
-        )}
+        {/* Top Badges & Bookmark */}
+        <div className="absolute top-2.5 right-2.5 flex items-center gap-1.5 z-10">
+          {creator.hasPaymentConfigured && (
+            <div className="rounded-full border border-amber-400/30 bg-black/70 px-2 py-0.5 text-[9px] font-medium text-amber-300 backdrop-blur-md">
+              ☕ Accepts Support
+            </div>
+          )}
+
+          <button
+            type="button"
+            onClick={handleBookmark}
+            disabled={saving}
+            className={`rounded-full border p-1 backdrop-blur-md transition cursor-pointer ${
+              isSaved
+                ? "border-rose-500/40 bg-rose-500/20 text-rose-300"
+                : "border-white/10 bg-black/60 text-gray-400 hover:text-rose-400 hover:bg-black/80"
+            }`}
+            title={isSaved ? "Saved" : "Save creator"}
+          >
+            <span className="text-xs">{isSaved ? "❤️" : "🤍"}</span>
+          </button>
+        </div>
       </div>
 
       {/* Profile Avatar & Info */}
@@ -102,7 +161,7 @@ const CreatorCard = ({ creator }) => {
 
         {/* Card Action */}
         <div className="mt-5 flex items-center justify-between border-t border-white/5 pt-4 text-xs font-semibold text-gray-300 transition-colors group-hover:text-amber-400">
-          <span>View Profile</span>
+          <span>View Creator Portfolio</span>
           <span className="transition-transform duration-200 group-hover:translate-x-1">
             →
           </span>

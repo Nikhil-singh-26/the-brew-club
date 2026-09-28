@@ -5,6 +5,17 @@ import CreatorCard from "./CreatorCard";
 import { fetchCreators } from "@/actions/useractions";
 import Link from "next/link";
 
+const SKILL_FILTERS = [
+  "All",
+  "Next.js",
+  "React",
+  "Node.js",
+  "TypeScript",
+  "AI",
+  "UI/UX",
+  "Python",
+];
+
 const CreatorsList = ({
   initialCreators = [],
   initialTotal = 0,
@@ -15,6 +26,7 @@ const CreatorsList = ({
   const [hasMore, setHasMore] = useState(initialHasMore);
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [selectedSkill, setSelectedSkill] = useState("All");
   const [loadingMore, setLoadingMore] = useState(false);
   const [searching, setSearching] = useState(false);
   const isFirstMount = useRef(true);
@@ -28,12 +40,13 @@ const CreatorsList = ({
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  // Execute search when debounced search term updates
-  const executeSearch = useCallback(async (query) => {
+  // Execute search when debounced search term or skill filter updates
+  const executeSearch = useCallback(async (query, skill) => {
     setSearching(true);
     try {
       const res = await fetchCreators({
         search: query,
+        skill: skill === "All" ? "" : skill,
         skip: 0,
         limit: 10,
       });
@@ -56,8 +69,8 @@ const CreatorsList = ({
       return;
     }
 
-    executeSearch(debouncedSearch);
-  }, [debouncedSearch, executeSearch]);
+    executeSearch(debouncedSearch, selectedSkill);
+  }, [debouncedSearch, selectedSkill, executeSearch]);
 
   // Load more creators
   const handleViewMore = async () => {
@@ -68,6 +81,7 @@ const CreatorsList = ({
       const nextSkip = creators.length;
       const res = await fetchCreators({
         search: debouncedSearch,
+        skill: selectedSkill === "All" ? "" : selectedSkill,
         skip: nextSkip,
         limit: 10,
       });
@@ -93,12 +107,13 @@ const CreatorsList = ({
   const handleClearSearch = () => {
     setSearchQuery("");
     setDebouncedSearch("");
+    setSelectedSkill("All");
   };
 
   return (
     <div className="w-full">
       {/* Search Bar Section */}
-      <div className="mx-auto max-w-2xl mb-12">
+      <div className="mx-auto max-w-2xl mb-8">
         <div className="relative">
           <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-gray-500">
             <svg
@@ -121,14 +136,14 @@ const CreatorsList = ({
             id="search-creators-input"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search creators by name, username, or craft..."
+            placeholder="Search creators by name, username, skill, or bio..."
             className="w-full rounded-2xl border border-white/10 bg-white/4 py-4 pl-12 pr-12 text-sm text-white outline-none transition placeholder:text-gray-500 focus:border-amber-400/60 focus:bg-black/60 focus:ring-4 focus:ring-amber-400/10 shadow-lg"
           />
 
           {searchQuery && (
             <button
               onClick={handleClearSearch}
-              className="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400 hover:text-white transition"
+              className="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400 hover:text-white transition cursor-pointer"
               title="Clear search"
               aria-label="Clear search"
             >
@@ -139,18 +154,39 @@ const CreatorsList = ({
           )}
         </div>
 
+        {/* Skill Filter Pills (FEATURE 6) */}
+        <div className="mt-4 flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+          <span className="text-xs text-gray-500 mr-1 shrink-0">Filter:</span>
+          {SKILL_FILTERS.map((skill) => (
+            <button
+              key={skill}
+              type="button"
+              onClick={() => setSelectedSkill(skill)}
+              className={`rounded-xl px-3 py-1.5 text-xs font-semibold transition shrink-0 cursor-pointer ${
+                selectedSkill === skill
+                  ? "bg-amber-400 text-black shadow-sm"
+                  : "bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-white/10"
+              }`}
+            >
+              {skill === "All" ? "All Skills" : `#${skill}`}
+            </button>
+          ))}
+        </div>
+
         {/* Search status indicator */}
-        <div className="mt-3 flex items-center justify-between px-2 text-xs text-gray-500">
+        <div className="mt-2 flex items-center justify-between px-2 text-xs text-gray-500">
           <div>
             {searching ? (
               <span className="flex items-center gap-2 text-amber-400">
                 <span className="h-3 w-3 animate-spin rounded-full border-2 border-amber-400/30 border-t-amber-400" />
                 Searching creators...
               </span>
-            ) : debouncedSearch ? (
+            ) : debouncedSearch || selectedSkill !== "All" ? (
               <span>
                 Results for &quot;
-                <span className="text-gray-300 font-medium">{debouncedSearch}</span>
+                <span className="text-gray-300 font-medium">
+                  {debouncedSearch || selectedSkill}
+                </span>
                 &quot; ({total} found)
               </span>
             ) : (
@@ -158,12 +194,12 @@ const CreatorsList = ({
             )}
           </div>
 
-          {debouncedSearch && (
+          {(debouncedSearch || selectedSkill !== "All") && (
             <button
               onClick={handleClearSearch}
-              className="text-amber-400 hover:underline transition text-xs"
+              className="text-amber-400 hover:underline transition text-xs cursor-pointer"
             >
-              Reset search
+              Reset filters
             </button>
           )}
         </div>
@@ -185,7 +221,7 @@ const CreatorsList = ({
                 type="button"
                 onClick={handleViewMore}
                 disabled={loadingMore}
-                className="group inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-8 py-3.5 text-sm font-semibold text-white transition-all duration-200 hover:border-amber-400/40 hover:bg-white/10 hover:shadow-lg hover:shadow-amber-500/10 active:scale-98 disabled:cursor-not-allowed disabled:opacity-50"
+                className="group inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-8 py-3.5 text-sm font-semibold text-white transition-all duration-200 hover:border-amber-400/40 hover:bg-white/10 hover:shadow-lg hover:shadow-amber-500/10 active:scale-98 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
               >
                 {loadingMore ? (
                   <>
@@ -194,7 +230,7 @@ const CreatorsList = ({
                   </>
                 ) : (
                   <>
-                    <span>View More</span>
+                    <span>View More Creators</span>
                     <span className="text-amber-400 transition-transform duration-200 group-hover:translate-y-0.5">
                       ↓
                     </span>
@@ -204,7 +240,7 @@ const CreatorsList = ({
             ) : (
               <div className="flex items-center gap-2 text-xs text-gray-500">
                 <span className="h-1.5 w-1.5 rounded-full bg-amber-400/40" />
-                <span>You&apos;ve reached the end.</span>
+                <span>You&apos;ve reached the end of the creators directory.</span>
                 <span className="h-1.5 w-1.5 rounded-full bg-amber-400/40" />
               </div>
             )}
@@ -214,28 +250,28 @@ const CreatorsList = ({
         /* Empty State */
         <div className="mx-auto max-w-md rounded-3xl border border-white/10 bg-white/2 p-10 text-center">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-400/10 text-2xl mb-4">
-            {debouncedSearch ? "🔍" : "☕"}
+            {debouncedSearch || selectedSkill !== "All" ? "🔍" : "☕"}
           </div>
 
           <h3 className="text-lg font-bold text-white">
-            {debouncedSearch
-              ? `No creators found for "${debouncedSearch}"`
+            {debouncedSearch || selectedSkill !== "All"
+              ? "No matching creators found"
               : "No creators registered yet"}
           </h3>
 
           <p className="mt-2 text-xs text-gray-400 leading-relaxed">
-            {debouncedSearch
-              ? "We couldn't find any creator matching your search term. Try checking for typos or searching with different keywords."
+            {debouncedSearch || selectedSkill !== "All"
+              ? "We couldn't find any creator matching your criteria. Try adjusting your search query or selecting a different skill."
               : "Be among the first creators to set up a profile, share your journey, and receive supporter backing on The Brew Club."}
           </p>
 
           <div className="mt-6 flex items-center justify-center gap-3">
-            {debouncedSearch ? (
+            {debouncedSearch || selectedSkill !== "All" ? (
               <button
                 onClick={handleClearSearch}
-                className="rounded-xl bg-linear-to-r from-amber-400 to-orange-500 px-6 py-2.5 text-xs font-bold text-black transition hover:opacity-95"
+                className="rounded-xl bg-linear-to-r from-amber-400 to-orange-500 px-6 py-2.5 text-xs font-bold text-black transition hover:opacity-95 cursor-pointer"
               >
-                Clear Search
+                Clear Filters
               </button>
             ) : (
               <Link

@@ -37,10 +37,23 @@ export async function generateMetadata({ params }) {
   const displayName = user?.name || username;
   const bio =
     user?.bio ||
-    `Support @${username} on The Brew Club. Fuel their creative journey.`;
+    `Support @${username} on The Brew Club — Discover their latest creations, projects, and creative journey.`;
 
   return {
-    title: `${displayName} (@${username}) - The Brew Club`,
+    title: `${displayName} (@${username}) — The Brew Club`,
     description: bio,
+    openGraph: {
+      title: `${displayName} (@${username}) — The Brew Club`,
+      description: bio,
+      type: "profile",
+      username: username,
+      images: user?.profilepic ? [{ url: user.profilepic }] : [],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${displayName} (@${username}) — The Brew Club`,
+      description: bio,
+      images: user?.profilepic ? [user.profilepic] : [],
+    },
   };
 }
