@@ -53,29 +53,6 @@
 
 ---
 
-## 🎨 Design System
-
-The Brew Club features a bespoke design system built from scratch with modern typography and an anti-AI aesthetic.
-
-| Design Token | Hex Code | Purpose |
-| :--- | :--- | :--- |
-| **Background** | `#171613` | Deep warm dark foundation |
-| **Elevated Surface** | `#201F1B` | Primary containers and cards |
-| **Secondary Surface** | `#282721` | Active states and hover elevations |
-| **Primary Text** | `#F4F0E8` | High-contrast warm off-white |
-| **Secondary Text** | `#AAA59A` | Readable secondary descriptions |
-| **Muted Text** | `#77736B` | Small metadata, timestamps, and placeholders |
-| **Primary Accent** | `#C96F43` | The Brew Club signature warm copper |
-| **Accent Hover** | `#D98255` | Interactive button hover states |
-| **Border** | `#34322C` | Crisp structural dividers and borders |
-| **Success** | `#7E9B72` | Natural sage green status |
-| **Error** | `#C85C52` | Muted terracotta alert |
-
-- **Typography**: `Instrument Sans` (Headings) + `Inter` (Body).
-- **Radii**: `6px` for small chips, `7px` for buttons/inputs, `10px` for cards, `12px` for modals.
-
----
-
 ## 🏗️ Tech Stack
 
 - **Framework**: [Next.js 16 (App Router)](https://nextjs.org/)
