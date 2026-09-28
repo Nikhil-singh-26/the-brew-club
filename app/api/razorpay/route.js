@@ -66,9 +66,9 @@ export const POST = async (req) => {
         await Notification.create({
           recipientUsername: updatedPayment.to_user,
           type: "payment",
-          title: `Received ₹${(updatedPayment.amount / 100).toLocaleString("en-IN")} from ${updatedPayment.isAnonymous ? "Anonymous Supporter" : updatedPayment.name}`,
+          title: `Received ₹${updatedPayment.amount.toLocaleString("en-IN")} from ${updatedPayment.isAnonymous ? "Anonymous Supporter" : updatedPayment.name}`,
           message: updatedPayment.message || "No message attached",
-          amount: updatedPayment.amount / 100,
+          amount: updatedPayment.amount,
         });
       } catch (notifErr) {
         console.error("Failed to create notification on payment:", notifErr);
