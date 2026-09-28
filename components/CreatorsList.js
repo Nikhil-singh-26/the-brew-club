@@ -239,7 +239,7 @@ const CreatorsList = ({
               </button>
             ) : (
               <Link
-                href="/login"
+                href="/join"
                 className="rounded-xl bg-linear-to-r from-amber-400 to-orange-500 px-6 py-2.5 text-xs font-bold text-black transition hover:opacity-95"
               >
                 Start Your Creator Page →

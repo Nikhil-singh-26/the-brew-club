@@ -6,4 +6,5 @@ export {
   fetchpayments,
   updateProfile,
   fetchCreators,
+  registerUser,
 } from "./useractions";

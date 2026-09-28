@@ -4,9 +4,10 @@ import React, { useState, useEffect } from "react";
 import { useSession, signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { registerUser } from "@/actions/useractions";
 import { useToast } from "@/components/Toast";
 
-const LoginPage = () => {
+const JoinPage = () => {
   const { status } = useSession();
   const router = useRouter();
   const { toast } = useToast();
@@ -41,37 +42,47 @@ const LoginPage = () => {
     }
 
     if (!password) {
-      setErrorMessage("Please enter your password.");
+      setErrorMessage("Please enter a password.");
+      return;
+    }
+
+    if (password.length < 6) {
+      setErrorMessage("Password must be at least 6 characters long.");
       return;
     }
 
     setLoading(true);
 
     try {
-      const res = await signIn("credentials", {
+      const regRes = await registerUser({
+        email: trimmedEmail,
+        password: password,
+      });
+
+      if (!regRes.success) {
+        setErrorMessage(regRes.error || "Failed to create account.");
+        setLoading(false);
+        return;
+      }
+
+      // Automatically sign in the newly registered user
+      const loginRes = await signIn("credentials", {
         email: trimmedEmail,
         password: password,
         redirect: false,
         callbackUrl: "/dashboard",
       });
 
-      if (res?.error) {
-        setErrorMessage(
-          res.error === "CredentialsSignin"
-            ? "Invalid email or password."
-            : res.error
-        );
-        setLoading(false);
-      } else if (res?.ok) {
-        toast.success("Welcome back! ☕");
+      if (loginRes?.ok) {
+        toast.success("Welcome to The Brew Club! ☕");
         router.push("/dashboard");
         router.refresh();
       } else {
-        setErrorMessage("Sign in failed. Please try again.");
-        setLoading(false);
+        toast.success("Account created successfully! Please sign in.");
+        router.push("/login");
       }
     } catch (err) {
-      console.error("Login error:", err);
+      console.error("Registration error:", err);
       setErrorMessage("An unexpected error occurred. Please try again.");
       setLoading(false);
     }
@@ -88,12 +99,12 @@ const LoginPage = () => {
           </div>
 
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-            Welcome to The Brew Club
+            Join The Brew Club
           </h1>
 
           <p className="mt-2 text-xs sm:text-sm text-gray-400">
-            Sign in to manage your creator profile, track supporter contributions,
-            or customize your payment gateway.
+            Create your account to start your creator page, receive supporter contributions,
+            or back your favorite creators.
           </p>
         </div>
 
@@ -112,13 +123,13 @@ const LoginPage = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label
-                htmlFor="login-email"
+                htmlFor="join-email"
                 className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-1.5"
               >
                 Email
               </label>
               <input
-                id="login-email"
+                id="join-email"
                 type="email"
                 name="email"
                 autoComplete="email"
@@ -136,19 +147,20 @@ const LoginPage = () => {
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label
-                  htmlFor="login-password"
+                  htmlFor="join-password"
                   className="block text-xs font-semibold text-gray-300 uppercase tracking-wider"
                 >
                   Password
                 </label>
+                <span className="text-[11px] text-gray-500">Min 6 characters</span>
               </div>
 
               <div className="relative">
                 <input
-                  id="login-password"
+                  id="join-password"
                   type={showPassword ? "text" : "password"}
                   name="password"
-                  autoComplete="current-password"
+                  autoComplete="new-password"
                   required
                   value={password}
                   onChange={(e) => {
@@ -229,10 +241,10 @@ const LoginPage = () => {
                       d="M4 12a8 8 0 018-8v8H4z"
                     />
                   </svg>
-                  Signing in...
+                  Creating account...
                 </span>
               ) : (
-                "Log in"
+                "Create account"
               )}
             </button>
           </form>
@@ -285,15 +297,15 @@ const LoginPage = () => {
             </button>
           </div>
 
-          {/* Join Link */}
+          {/* Log in Link */}
           <div className="mt-6 pt-5 border-t border-white/10 text-center">
             <p className="text-xs text-gray-400">
-              Don&apos;t have an account?{" "}
+              Already have an account?{" "}
               <Link
-                href="/join"
+                href="/login"
                 className="text-amber-400 hover:text-amber-300 font-semibold transition underline underline-offset-2"
               >
-                Join the club
+                Log in
               </Link>
             </p>
           </div>
@@ -303,4 +315,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default JoinPage;

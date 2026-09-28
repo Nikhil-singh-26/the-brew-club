@@ -4,6 +4,7 @@ import Razorpay from "razorpay";
 import Payment from "@/models/Payment";
 import connectDb from "@/db/connectDb";
 import User from "@/models/User";
+import bcrypt from "bcryptjs";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
@@ -322,3 +323,113 @@ export const fetchCreators = async ({ search = "", skip = 0, limit = 10 } = {}) 
     };
   }
 };
+
+export const registerUser = async (formData) => {
+  try {
+    let email = "";
+    let password = "";
+
+    if (formData && typeof formData.get === "function") {
+      email = formData.get("email");
+      password = formData.get("password");
+    } else if (formData && typeof formData === "object") {
+      email = formData.email;
+      password = formData.password;
+    }
+
+    const rawEmail = typeof email === "string" ? email.trim().toLowerCase() : "";
+    const rawPassword = typeof password === "string" ? password : "";
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!rawEmail || !emailRegex.test(rawEmail)) {
+      return {
+        success: false,
+        error: "Please enter a valid email address.",
+      };
+    }
+
+    if (!rawPassword || rawPassword.length < 6) {
+      return {
+        success: false,
+        error: "Password must be at least 6 characters long.",
+      };
+    }
+
+    await connectDb();
+
+    const existingUser = await User.findOne({ email: rawEmail });
+    if (existingUser) {
+      if (existingUser.password) {
+        return {
+          success: false,
+          error: "An account with this email already exists. Please log in.",
+        };
+      } else {
+        return {
+          success: false,
+          error:
+            "This email was registered with Google or GitHub. Please log in using that provider.",
+        };
+      }
+    }
+
+    let baseUsername = rawEmail.split("@")[0].toLowerCase().replace(/[^a-z0-9_]/g, "");
+    if (!baseUsername || baseUsername.length < 2) {
+      baseUsername = "user";
+    }
+
+    const reservedUsernames = [
+      "dashboard",
+      "profile",
+      "login",
+      "join",
+      "about",
+      "api",
+      "admin",
+      "user",
+      "terms",
+      "privacy",
+      "explore",
+      "home",
+      "creators",
+      "favicon.ico",
+    ];
+
+    let finalUsername = baseUsername;
+    let counter = 1;
+    while (
+      reservedUsernames.includes(finalUsername) ||
+      (await User.findOne({ username: finalUsername }))
+    ) {
+      finalUsername = `${baseUsername}${counter}`;
+      counter++;
+    }
+
+    const hashedPassword = await bcrypt.hash(rawPassword, 10);
+
+    await User.create({
+      email: rawEmail,
+      name: baseUsername,
+      username: finalUsername,
+      password: hashedPassword,
+      profilepic: "",
+      coverpic: "",
+      bio: "",
+      razorpayid: "",
+      razorpaysecret: "",
+    });
+
+    return {
+      success: true,
+      message: "Account created successfully.",
+      username: finalUsername,
+    };
+  } catch (error) {
+    console.error("Error in registerUser:", error);
+    return {
+      success: false,
+      error: error.message || "Failed to create account. Please try again.",
+    };
+  }
+};
+

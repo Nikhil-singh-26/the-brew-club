@@ -186,7 +186,7 @@ const Navbar = () => {
               </Link>
 
               <Link
-                href="/login"
+                href="/join"
                 className="rounded-full bg-linear-to-r from-amber-400 to-orange-500 px-4 py-2 text-sm font-semibold text-black transition-all duration-200 hover:opacity-95 hover:shadow-lg hover:shadow-orange-500/20"
               >
                 Join the club

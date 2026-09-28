@@ -42,7 +42,7 @@ export default function Home() {
             </Link>
 
             <Link
-              href="/login"
+              href="/join"
               className="w-full sm:w-auto px-8 py-3.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-white font-semibold transition-all duration-200 text-center"
             >
               Start Your Creator Page
@@ -163,7 +163,7 @@ export default function Home() {
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
             <Link
-              href="/login"
+              href="/join"
               className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-linear-to-r from-amber-400 to-orange-500 hover:opacity-95 text-black font-bold transition-all duration-200 hover:-translate-y-0.5 shadow-lg shadow-orange-500/20"
             >
               Get Started with The Brew Club →

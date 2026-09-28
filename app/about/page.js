@@ -123,7 +123,7 @@ const About = () => {
               Discover Creators →
             </Link>
             <Link
-              href="/login"
+              href="/join"
               className="px-8 py-3.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-white font-semibold transition-all duration-200"
             >
               Join The Brew Club
